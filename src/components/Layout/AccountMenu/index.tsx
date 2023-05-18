@@ -1,65 +1,58 @@
-import useOnClickOutside from 'hooks/useOnClickOutside'
-import { Edit, HelpCircle, Lock, ToggleRight, User } from 'lucide-react'
-import { useRef, useState } from 'react'
-export interface IAccountMenuProps {}
+import DropDown from '@/components/Dropdown'
+import DropDownContent from '@/components/Dropdown/DropDownContent'
+import DropdownItem from '@/components/Dropdown/DropdownItem'
+import HeaderDropdown from '@/components/Dropdown/HeaderDropdown'
+import Modal from '@/components/Modal'
+import useModal from '@/hooks/useModal'
+import { useAuth } from 'contexts/auth'
+import { useLayout } from 'contexts/layout'
+import { useState } from 'react'
+import logo from '@/assets/images/logo-fqa.svg'
+import ModalChangePassword from '@/components/ModalChangePassword'
+export interface IAccountMenuProps { }
 
 export default function AccountMenu(props: IAccountMenuProps) {
-  return (
-    <div className="intro-x dropdown w-8 h-8">
-      <div
-        className="dropdown-toggle w-8 h-8 rounded-full overflow-hidden shadow-lg image-fit zoom-in scale-110"
-        role="button"
-        aria-expanded="false"
-        data-tw-toggle="dropdown"
-      >
-        <img
-          alt="Midone - HTML Admin Template"
-          src="/src/assets/images/profile-4.jpg"
-        />
-      </div>
-      <div className="dropdown-menu w-56">
-        <ul className="dropdown-content bg-primary/80 before:block before:absolute before:bg-black before:inset-0 before:rounded-md before:z-[-1] text-white">
-          <li className="p-2">
-            <div className="font-medium">Russell Crowe</div>
-            <div className="mt-0.5 text-xs text-white/60 dark:text-slate-500">
-              Software Engineer
-            </div>
-          </li>
-          <li>
-            <hr className="dropdown-divider border-white/[0.08]" />
-          </li>
-          <li>
-            <a className="dropdown-item hover:bg-white/5">
-              <User className="mr-2 h-4 w-4" /> Profile
-            </a>
-          </li>
-          <li>
-            <a className="dropdown-item hover:bg-white/5">
-              <Edit className="mr-2 h-4 w-4" /> Add Account
-            </a>
-          </li>
-          <li>
-            <a className="dropdown-item hover:bg-white/5">
-              <Lock className="mr-2 h-4 w-4" /> Reset Password
-            </a>
-          </li>
-          <li>
-            <a className="dropdown-item hover:bg-white/5">
-              <HelpCircle className="mr-2 h-4 w-4" />
-              Help
-            </a>
-          </li>
-          <li>
-            <hr className="dropdown-divider border-white/[0.08]" />
-          </li>
-          <li>
-            <a className="dropdown-item hover:bg-white/5">
-              <ToggleRight className="mr-2 h-4 w-4" />
-              Logout
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  )
+	const [openDropdown, setOpenDropdown] = useState<boolean>(false)
+	const [changePassword, setChangePassword] = useState<boolean>(false)
+	const { show: logoutModal,
+		handleShow: handleShowLogoutModal,
+		handleClose: handleCloseLogoutModal
+	} = useModal()
+	const { hasDirtyForm } = useLayout()
+	const { signOut } = useAuth()
+
+	return (
+		<>
+			<Modal
+				title="Đăng xuất"
+				open={logoutModal}
+				handleCancel={handleCloseLogoutModal}
+				handleConfirm={signOut}
+			>
+				{hasDirtyForm ? "Nếu thoát ngay bây giờ thì các thông tin sẽ không được lưu." : "Bạn chắc chắn muốn đăng xuất ?"}
+			</Modal>
+			<ModalChangePassword
+				changePassword={changePassword}
+				setChangePassword={setChangePassword}
+			/>
+			<div className="intro-x dropdown w-8 h-8">
+				<DropDown handleClose={() => setOpenDropdown(false)}>
+					<HeaderDropdown toggle={() => setOpenDropdown(x => !x)}>
+						<>
+							<div
+								className="zoom-in h-8 w-8 bg-[antiquewhite] text-black uppercase scale-110 overflow-hidden rounded-full shadow-lg flex items-center justify-center text-2xl "
+								onClick={() => setOpenDropdown(x => !x)}
+							>
+								<img src={logo} alt="" />
+							</div>
+						</>
+					</HeaderDropdown>
+					<DropDownContent isOpen={openDropdown}>
+						<DropdownItem onClick={() => setChangePassword(true)}>Đổi mật khẩu</DropdownItem>
+						<DropdownItem onClick={() => { setOpenDropdown(false); handleShowLogoutModal() }}>Đăng xuất</DropdownItem>
+					</DropDownContent>
+				</DropDown>
+			</div>
+		</>
+	)
 }

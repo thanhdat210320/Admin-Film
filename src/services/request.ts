@@ -59,7 +59,7 @@ export async function getAsync(
 export async function deleteAsync(url: string): Promise<CommonResponse> {
   try {
     const response = await axiosClient(url, {
-      method: 'DELETE'
+      method: 'DELETE',
     })
     return Promise.resolve({
       status: response?.data?.status,

@@ -1,6 +1,22 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
+    "paths": {
+      "@/assets/*": ["assets/*"],
+      "@/constants/*": ["constants/*"],
+			"@/components/*": ["components/*"],
+      "@/modules/*": ["modules/*"],
+      "@/utils/*": ["utils/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/models/*": ["models/*"],
+      "@/shared/*": ["shared/*"],
+      "@/services/*": ["services/*"],
+      "@/pages/*": ["pages/*"],
+      "@/contants/*": ["contants/*"],
+      "@/contexts/*": ["contexts/*"],
+			"@/public/*": ["public/*"],
+
+    },
     "target": "esnext",
     "lib": [
       "dom",
@@ -26,14 +42,21 @@
     "noUnusedParameters": false,
     "allowUnreachableCode": false,
     "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/public/*": [
-        "./src/public/*"
-      ]
-    }
+    // "paths": {
+    //   "@/*": [
+    //     "./src/*"
+    //   ],
+    //   "@/public/*": [
+    //     "./src/public/*"
+    //   ],
+		// 	 "@/filters/*": ["filters/*"],
+    //   "@/constants/*": ["constants/*"],
+    //   "@/modules/*": ["modules/*"],
+    //   "@/utils/*": ["utils/*"],
+    //   "@/middleware/*": ["middleware/*"],
+    //   "@/decorators/*": ["decorators/*"],
+    //   "@/shared/*": ["shared/*"]
+    // }
   },
   "include": [
     "src"

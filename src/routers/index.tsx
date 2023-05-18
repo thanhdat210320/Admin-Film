@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Layout from 'components/Layout'
+import PrivateRouter from './privateRouter'
 
 const SignIn = lazy(() => import('../pages/Signin'))
 const SignUp = lazy(() => import('../pages/SignUp'))
@@ -21,9 +22,11 @@ const AppRouter = () => {
 				path="/"
 				element={
 					<Suspense>
+					 <PrivateRouter >
 						<Layout>
 							<Home />
 						</Layout>
+						</PrivateRouter>
 					</Suspense>
 				}
 			/>
@@ -31,9 +34,11 @@ const AppRouter = () => {
 				path="/users"
 				element={
 					<Suspense>
+						 <PrivateRouter >
 						<Layout>
 							<Users />
 						</Layout>
+						</PrivateRouter>
 					</Suspense>
 				}
 			/>
@@ -41,9 +46,11 @@ const AppRouter = () => {
 				path="/user/:id"
 				element={
 					<Suspense>
+						<PrivateRouter>
 						<Layout>
 							<UserDetail />
 						</Layout>
+						</PrivateRouter>
 					</Suspense>
 				}
 			/>
@@ -51,9 +58,11 @@ const AppRouter = () => {
 				path="/exercise"
 				element={
 					<Suspense>
+						<PrivateRouter>
 						<Layout>
 							<Exercise />
 						</Layout>
+						</PrivateRouter>
 					</Suspense>
 				}
 			/>
@@ -61,9 +70,11 @@ const AppRouter = () => {
 				path="/study"
 				element={
 					<Suspense>
+						<PrivateRouter>
 						<Layout>
 							<Study />
 						</Layout>
+						</PrivateRouter>
 					</Suspense>
 				}
 			/>
