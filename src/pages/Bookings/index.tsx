@@ -7,21 +7,22 @@ import { Edit, Plus, X } from 'lucide-react'
 import Modal from '@/components/Modal'
 import { toast } from 'react-toastify'
 import ticketAPI from '@/services/tickets.service'
-import ModalEditTicket from '@/components/ModalEditTicket'
-import ModalAddTicket from '@/components/ModalAddTicket'
+import ModalEditBookings from '@/components/ModalEditBookings'
+import ModalAddBookings from '@/components/ModalAddBookings'
+import bookingsAPI from '@/services/bookings.service'
 
-const Ticket = () => {
+const Bookings = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
   const [showModalEdit, setShowModalEdit] = useState<boolean>(false);
-  const [itemTicket, setItemTicket] = useState<any>({});
-  const [idTicket, setIdTicket] = useState<any>();
-  const [tickets, setTickets] = useState<any>([]);
+  const [itemBookings, setItemBookings] = useState<any>({});
+  const [idBookings, setIdBookings] = useState<any>();
+  const [bookings, setBookings] = useState<any>([]);
 
-  const getDataListTickets = async () => {
+  const getDataListBookings = async () => {
     try {
-      const data = await ticketAPI.getTicket()
-      setTickets(data?.data?.data)
+      const data = await bookingsAPI.getBookings()
+      setBookings(data?.data?.data)
     } catch (error) {
       console.log(error)
     }
@@ -29,13 +30,13 @@ const Ticket = () => {
 
   const handleConfirmDelete = async () => {
     try {
-			const res = await ticketAPI.deleteTicket(idTicket)
+			const res = await bookingsAPI.deleteBookings(idBookings)
 			setShowModalDelete(false)
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
 			} else {
-				toast.success('Xóa user thành công.')
-				getDataListTickets()
+				toast.success('Xóa ticket thành công.')
+				getDataListBookings()
 			}
 		} catch (error) {
 			console.log(error)
@@ -44,33 +45,33 @@ const Ticket = () => {
 
   const handleStatus = (id: any) => {
 		setShowModalDelete(true)
-    setIdTicket(id)
+    setIdBookings(id)
 	}
 
   const handleUpdate = (item: any) => {
 		setShowModalEdit(true)
-		setItemTicket(item)
+		setItemBookings(item)
 	}
 
   useEffect(() => {
-    getDataListTickets()
+    getDataListBookings()
   }, [])
 
   return (
     <>
-    	<ModalAddTicket
+    	<ModalAddBookings
 				showModalAdd={showModalAdd}
 				setShowModalAdd={setShowModalAdd}
 				callBack={() => {
-					getDataListTickets()
+					getDataListBookings()
 				}}
 			/>
-      <ModalEditTicket
+      <ModalEditBookings
 				showModalEdit={showModalEdit}
 				setShowModalEdit={setShowModalEdit}
-				itemTicket={itemTicket}
+				itemBookings={itemBookings}
 				callBack={() => {
-					getDataListTickets()
+					getDataListBookings()
 				}}
 			/>
       <Modal
@@ -85,7 +86,7 @@ const Ticket = () => {
         <div className="wrapper-box">
           <div className="content">
             <div className="intro-y flex items-center mt-8">
-              <h2 className="text-lg font-medium mr-auto">Danh sách Ticket</h2>
+              <h2 className="text-lg font-medium mr-auto">Danh sách Bookings</h2>
             </div>
             <div className="grid grid-cols-24 gap-6 mt-5 overflow-y-auto">
               <div className="intro-y col-span-12 lg:col-span-6">
@@ -137,7 +138,7 @@ const Ticket = () => {
                           </thead>
                           <tbody>
                             {
-                              tickets?.map((item: any) => {
+                              bookings?.map((item: any) => {
                                 return (
                                   <>
                                     <tr className="text-center">
@@ -193,4 +194,4 @@ const Ticket = () => {
   )
 }
 
-export default Ticket
+export default Bookings

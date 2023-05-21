@@ -1,28 +1,28 @@
 import { CommonResponse } from "models/common";
 import { getAsync, patchAsync, deleteAsync, postAsync, putAsync } from "./request";
 
-const moviesAPI = {
-	getMovies(params?: any): Promise<CommonResponse> {
-		const url = "/v1/movies"
+const bookingsAPI = {
+	getBookings(params?: any): Promise<CommonResponse> {
+		const url = "/v1/bookings"
 		return getAsync(url, params);
 	},
-	addMovies( params: any): Promise<CommonResponse> {
-		const url = "/v1/movies"
+	addBookings( params: any): Promise<CommonResponse> {
+		const url = "/v1/bookings"
 		return postAsync(url, params);
 	},
-	updateMovies(
+	updateBookings(
     id: string,
     params: any
   ): Promise<CommonResponse> {
-    const url = `/v1/movies/${id}`
+    const url = `/v1/bookings/${id}`
     return putAsync(url, params)
   },
-	deleteMovies(
+	deleteBookings(
     id: string
   ): Promise<CommonResponse> {
-    const url = `/v1/movies/delete/${id}`
+    const url = `/v1/bookings/delete/${id}`
     return deleteAsync(url)
   }
 };
 
-export default moviesAPI;
+export default bookingsAPI;

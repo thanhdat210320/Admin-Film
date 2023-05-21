@@ -6,9 +6,9 @@ import ReactSelect from 'react-select'
 import { Edit, Plus, X } from 'lucide-react'
 import Modal from '@/components/Modal'
 import { toast } from 'react-toastify'
-import ticketAPI from '@/services/tickets.service'
-import ModalEditTicket from '@/components/ModalEditTicket'
-import ModalAddTicket from '@/components/ModalAddTicket'
+import ModalEditMovies from '@/components/ModalEditMovies'
+import ModalAddMovies from '@/components/ModalAddMovies'
+import moviesAPI from '@/services/movies.service'
 
 const Movies = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
@@ -16,12 +16,12 @@ const Movies = () => {
   const [showModalEdit, setShowModalEdit] = useState<boolean>(false);
   const [itemMovies, setItemMovies] = useState<any>({});
   const [idMovies, setIdMovies] = useState<any>();
-  const [tickets, setTickets] = useState<any>([]);
+  const [movies, setMovies] = useState<any>([]);
 
-  const getDataListTickets = async () => {
+  const getDataListMovies = async () => {
     try {
-      const data = await ticketAPI.getTicket()
-      setTickets(data?.data?.data)
+      const data = await moviesAPI.getMovies()
+      setMovies(data?.data?.data)
     } catch (error) {
       console.log(error)
     }
@@ -29,13 +29,13 @@ const Movies = () => {
 
   const handleConfirmDelete = async () => {
     try {
-			const res = await ticketAPI.deleteTicket(idTicket)
+			const res = await moviesAPI.deleteMovies(idMovies)
 			setShowModalDelete(false)
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
 			} else {
-				toast.success('Xóa user thành công.')
-				getDataListTickets()
+				toast.success('Xóa phim thành công.')
+				getDataListMovies()
 			}
 		} catch (error) {
 			console.log(error)
@@ -44,33 +44,33 @@ const Movies = () => {
 
   const handleStatus = (id: any) => {
 		setShowModalDelete(true)
-    setIdTicket(id)
+    setIdMovies(id)
 	}
 
   const handleUpdate = (item: any) => {
 		setShowModalEdit(true)
-		setItemTicket(item)
+		setItemMovies(item)
 	}
 
   useEffect(() => {
-    getDataListTickets()
+    getDataListMovies()
   }, [])
 
   return (
     <>
-    	<ModalAddTicket
+    	<ModalAddMovies
 				showModalAdd={showModalAdd}
 				setShowModalAdd={setShowModalAdd}
 				callBack={() => {
-					getDataListTickets()
+					getDataListMovies()
 				}}
 			/>
-      <ModalEditTicket
+      <ModalEditMovies
 				showModalEdit={showModalEdit}
 				setShowModalEdit={setShowModalEdit}
-				itemTicket={itemTicket}
+				itemMovies={itemMovies}
 				callBack={() => {
-					getDataListTickets()
+					getDataListMovies()
 				}}
 			/>
       <Modal
@@ -79,13 +79,13 @@ const Movies = () => {
 				handleCancel={() => setShowModalDelete(false)}
 				handleConfirm={handleConfirmDelete}
 			>
-				Bạn chắc chắn muốn Xóa ticket này chứ?
+				Bạn chắc chắn muốn Xóa movies này chứ?
 			</Modal>
       <div className="wrapper">
         <div className="wrapper-box">
           <div className="content">
             <div className="intro-y flex items-center mt-8">
-              <h2 className="text-lg font-medium mr-auto">Danh sách Ticket</h2>
+              <h2 className="text-lg font-medium mr-auto">Danh sách Movies</h2>
             </div>
             <div className="grid grid-cols-24 gap-6 mt-5 overflow-y-auto">
               <div className="intro-y col-span-12 lg:col-span-6">
@@ -127,28 +127,26 @@ const Movies = () => {
                           <thead className="table-dark">
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
-                              <th className="whitespace-nowrap">Họ tên</th>
-                              <th className="whitespace-nowrap">Username</th>
-                              <th className="whitespace-nowrap">Role</th>
-                              <th className="whitespace-nowrap">Email</th>
-                              <th className="whitespace-nowrap">SĐT</th>
-                              <th className="whitespace-nowrap">Operation</th>
+                              <th className="whitespace-nowrap">Tên</th>
+															<th className="whitespace-nowrap">Trailer</th>
+                              <th className="whitespace-nowrap">Thể loại</th>
+                              <th className="whitespace-nowrap">Độ dài</th>
+                              <th className="whitespace-nowrap">Chức năng</th>
                             </tr>
                           </thead>
                           <tbody>
                             {
-                              tickets?.map((item: any) => {
+                              movies?.map((item: any) => {
                                 return (
                                   <>
                                     <tr className="text-center">
                                       <td>{item.id}</td>
-                                      <td>{item.name}</td>
-                                      <td>{item.username}</td>
-                                      <td>{item.role}</td>
-                                      <td>{item.email}</td>
-                                      <td>{item.phoneNumber}</td>
+                                      <td>{item.title}</td>
+																			<td>{item.trailer}</td>
+                                      <td>{item.genre}</td>
+                                      <td>{item.duration}p</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
-                                        <div className="flex items-center justify-around"> 
+                                        <div className="flex items-center justify-around">
                                           <div className="cursor-pointer font-semibold text-sky-600 hover:opacity-60 flex items-center" onClick={() => handleUpdate(item)}>
                                             <div className='inline-block' />
                                             <Edit className='mr-1.5 inline-block' size={16} />

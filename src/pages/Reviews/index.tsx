@@ -7,21 +7,22 @@ import { Edit, Plus, X } from 'lucide-react'
 import Modal from '@/components/Modal'
 import { toast } from 'react-toastify'
 import ticketAPI from '@/services/tickets.service'
-import ModalEditTicket from '@/components/ModalEditTicket'
-import ModalAddTicket from '@/components/ModalAddTicket'
+import ModalEditReviews from '@/components/ModalEditReviews'
+import ModalAddReviews from '@/components/ModalAddReviews'
+import reviewsAPI from '@/services/reviews.service'
 
 const Ticket = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
   const [showModalEdit, setShowModalEdit] = useState<boolean>(false);
-  const [itemTicket, setItemTicket] = useState<any>({});
-  const [idTicket, setIdTicket] = useState<any>();
-  const [tickets, setTickets] = useState<any>([]);
+  const [itemReviews, setItemReviews] = useState<any>({});
+  const [idReviews, setIdReviews] = useState<any>();
+  const [reviews, setReviews] = useState<any>([]);
 
-  const getDataListTickets = async () => {
+  const getDataListReviews = async () => {
     try {
-      const data = await ticketAPI.getTicket()
-      setTickets(data?.data?.data)
+      const data = await reviewsAPI.getReviews()
+      setReviews(data?.data?.data)
     } catch (error) {
       console.log(error)
     }
@@ -29,13 +30,13 @@ const Ticket = () => {
 
   const handleConfirmDelete = async () => {
     try {
-			const res = await ticketAPI.deleteTicket(idTicket)
+			const res = await reviewsAPI.deleteReviews(idReviews)
 			setShowModalDelete(false)
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
 			} else {
 				toast.success('Xóa user thành công.')
-				getDataListTickets()
+				getDataListReviews()
 			}
 		} catch (error) {
 			console.log(error)
@@ -44,33 +45,33 @@ const Ticket = () => {
 
   const handleStatus = (id: any) => {
 		setShowModalDelete(true)
-    setIdTicket(id)
+    setIdReviews(id)
 	}
 
   const handleUpdate = (item: any) => {
 		setShowModalEdit(true)
-		setItemTicket(item)
+		setItemReviews(item)
 	}
 
   useEffect(() => {
-    getDataListTickets()
+    getDataListReviews()
   }, [])
 
   return (
     <>
-    	<ModalAddTicket
+    	<ModalAddReviews
 				showModalAdd={showModalAdd}
 				setShowModalAdd={setShowModalAdd}
 				callBack={() => {
-					getDataListTickets()
+					getDataListReviews()
 				}}
 			/>
-      <ModalEditTicket
+      <ModalEditReviews
 				showModalEdit={showModalEdit}
 				setShowModalEdit={setShowModalEdit}
-				itemTicket={itemTicket}
+				itemReviews={itemReviews}
 				callBack={() => {
-					getDataListTickets()
+					getDataListReviews()
 				}}
 			/>
       <Modal
@@ -79,13 +80,13 @@ const Ticket = () => {
 				handleCancel={() => setShowModalDelete(false)}
 				handleConfirm={handleConfirmDelete}
 			>
-				Bạn chắc chắn muốn Xóa ticket này chứ?
+				Bạn chắc chắn muốn Xóa reviews này chứ?
 			</Modal>
       <div className="wrapper">
         <div className="wrapper-box">
           <div className="content">
             <div className="intro-y flex items-center mt-8">
-              <h2 className="text-lg font-medium mr-auto">Danh sách Ticket</h2>
+              <h2 className="text-lg font-medium mr-auto">Danh sách Reviews</h2>
             </div>
             <div className="grid grid-cols-24 gap-6 mt-5 overflow-y-auto">
               <div className="intro-y col-span-12 lg:col-span-6">
@@ -132,12 +133,12 @@ const Ticket = () => {
                               <th className="whitespace-nowrap">Role</th>
                               <th className="whitespace-nowrap">Email</th>
                               <th className="whitespace-nowrap">SĐT</th>
-                              <th className="whitespace-nowrap">Chức năng</th>
+                              <th className="whitespace-nowrap">Operation</th>
                             </tr>
                           </thead>
                           <tbody>
                             {
-                              tickets?.map((item: any) => {
+                              reviews?.map((item: any) => {
                                 return (
                                   <>
                                     <tr className="text-center">

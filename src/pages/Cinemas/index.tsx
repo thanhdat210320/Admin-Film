@@ -6,22 +6,22 @@ import ReactSelect from 'react-select'
 import { Edit, Plus, X } from 'lucide-react'
 import Modal from '@/components/Modal'
 import { toast } from 'react-toastify'
-import ticketAPI from '@/services/tickets.service'
-import ModalEditTicket from '@/components/ModalEditTicket'
-import ModalAddTicket from '@/components/ModalAddTicket'
+import ModalEditCinemas from '@/components/ModalEditCinemas'
+import ModalAddCinemas from '@/components/ModalAddCinemas'
+import cinemasAPI from '@/services/cinemas.service'
 
-const Ticket = () => {
+const Cinemas = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
   const [showModalEdit, setShowModalEdit] = useState<boolean>(false);
-  const [itemTicket, setItemTicket] = useState<any>({});
-  const [idTicket, setIdTicket] = useState<any>();
-  const [tickets, setTickets] = useState<any>([]);
+  const [itemCinemas, setItemCinemas] = useState<any>({});
+  const [idCinemas, setIdCinemas] = useState<any>();
+  const [cinemas, setCinemas] = useState<any>([]);
 
-  const getDataListTickets = async () => {
+  const getDataListCinemas = async () => {
     try {
-      const data = await ticketAPI.getTicket()
-      setTickets(data?.data?.data)
+      const data = await cinemasAPI.getCinemas()
+      setCinemas(data?.data?.data)
     } catch (error) {
       console.log(error)
     }
@@ -29,13 +29,13 @@ const Ticket = () => {
 
   const handleConfirmDelete = async () => {
     try {
-			const res = await ticketAPI.deleteTicket(idTicket)
+			const res = await cinemasAPI.deleteCinemas(idCinemas)
 			setShowModalDelete(false)
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
 			} else {
 				toast.success('Xóa user thành công.')
-				getDataListTickets()
+				getDataListCinemas()
 			}
 		} catch (error) {
 			console.log(error)
@@ -44,33 +44,33 @@ const Ticket = () => {
 
   const handleStatus = (id: any) => {
 		setShowModalDelete(true)
-    setIdTicket(id)
+    setIdCinemas(id)
 	}
 
   const handleUpdate = (item: any) => {
 		setShowModalEdit(true)
-		setItemTicket(item)
+		setItemCinemas(item)
 	}
 
   useEffect(() => {
-    getDataListTickets()
+    getDataListCinemas()
   }, [])
 
   return (
     <>
-    	<ModalAddTicket
+    	<ModalAddCinemas
 				showModalAdd={showModalAdd}
 				setShowModalAdd={setShowModalAdd}
 				callBack={() => {
-					getDataListTickets()
+					getDataListCinemas()
 				}}
 			/>
-      <ModalEditTicket
+      <ModalEditCinemas
 				showModalEdit={showModalEdit}
 				setShowModalEdit={setShowModalEdit}
-				itemTicket={itemTicket}
+				itemCinemas={itemCinemas}
 				callBack={() => {
-					getDataListTickets()
+					getDataListCinemas()
 				}}
 			/>
       <Modal
@@ -79,13 +79,13 @@ const Ticket = () => {
 				handleCancel={() => setShowModalDelete(false)}
 				handleConfirm={handleConfirmDelete}
 			>
-				Bạn chắc chắn muốn Xóa ticket này chứ?
+				Bạn chắc chắn muốn Xóa cinemas này chứ?
 			</Modal>
       <div className="wrapper">
         <div className="wrapper-box">
           <div className="content">
             <div className="intro-y flex items-center mt-8">
-              <h2 className="text-lg font-medium mr-auto">Danh sách Ticket</h2>
+              <h2 className="text-lg font-medium mr-auto">Danh sách Cinemas</h2>
             </div>
             <div className="grid grid-cols-24 gap-6 mt-5 overflow-y-auto">
               <div className="intro-y col-span-12 lg:col-span-6">
@@ -127,26 +127,18 @@ const Ticket = () => {
                           <thead className="table-dark">
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
-                              <th className="whitespace-nowrap">Họ tên</th>
-                              <th className="whitespace-nowrap">Username</th>
-                              <th className="whitespace-nowrap">Role</th>
-                              <th className="whitespace-nowrap">Email</th>
-                              <th className="whitespace-nowrap">SĐT</th>
+                              <th className="whitespace-nowrap">Tên</th>
                               <th className="whitespace-nowrap">Chức năng</th>
                             </tr>
                           </thead>
                           <tbody>
                             {
-                              tickets?.map((item: any) => {
+                              cinemas?.map((item: any) => {
                                 return (
                                   <>
                                     <tr className="text-center">
                                       <td>{item.id}</td>
                                       <td>{item.name}</td>
-                                      <td>{item.username}</td>
-                                      <td>{item.role}</td>
-                                      <td>{item.email}</td>
-                                      <td>{item.phoneNumber}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
                                         <div className="flex items-center justify-around">
                                           <div className="cursor-pointer font-semibold text-sky-600 hover:opacity-60 flex items-center" onClick={() => handleUpdate(item)}>
@@ -193,4 +185,4 @@ const Ticket = () => {
   )
 }
 
-export default Ticket
+export default Cinemas

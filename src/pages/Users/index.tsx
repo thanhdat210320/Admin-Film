@@ -133,7 +133,7 @@ const Users = () => {
                               <th className="whitespace-nowrap">Role</th>
                               <th className="whitespace-nowrap">Email</th>
                               <th className="whitespace-nowrap">SĐT</th>
-                              <th className="whitespace-nowrap">Operation</th>
+                              <th className="whitespace-nowrap">Chức năng</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -149,7 +149,7 @@ const Users = () => {
                                       <td>{item.email}</td>
                                       <td>{item.phoneNumber}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
-                                        <div className="flex items-center justify-around"> 
+                                        <div className="flex items-center justify-around">
                                           <div className="cursor-pointer font-semibold text-sky-600 hover:opacity-60 flex items-center" onClick={() => handleUpdate(item)}>
                                             <div className='inline-block' />
                                             <Edit className='mr-1.5 inline-block' size={16} />
