@@ -128,6 +128,8 @@ const Movies = () => {
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
                               <th className="whitespace-nowrap">Tên</th>
+															<th className="whitespace-nowrap">Poster</th>
+															<th className="whitespace-nowrap">Banner</th>
 															<th className="whitespace-nowrap">Trailer</th>
                               <th className="whitespace-nowrap">Thể loại</th>
                               <th className="whitespace-nowrap">Độ dài</th>
@@ -142,6 +144,8 @@ const Movies = () => {
                                     <tr className="text-center">
                                       <td>{item.id}</td>
                                       <td>{item.title}</td>
+																			<td><img src={item.poster} alt="" /></td>
+																			<td><img src={item.banner} alt="" /></td>
 																			<td>{item.trailer}</td>
                                       <td>{item.genre}</td>
                                       <td>{item.duration}p</td>

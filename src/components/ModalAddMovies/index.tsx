@@ -10,6 +10,8 @@ import moviesAPI from "@/services/movies.service";
 const schema = yup.object().shape({
 	title: yup.string().required("Vui lòng nhập title"),
 	genre: yup.string().required("Vui lòng nhập genre"),
+	poster: yup.string().required("Vui lòng nhập poster"),
+	banner: yup.string().required("Vui lòng nhập banner"),
 	trailer:yup.string().required("Vui lòng nhập trailer"),
 	duration: yup.string().required("Vui lòng nhập duration")
 })
@@ -32,6 +34,8 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 		defaultValues: {
 			title: '',
 			genre: '',
+			poster: '',
+			banner: '',
 			trailer: '',
 			duration: ''
 		}
@@ -44,6 +48,8 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 			const res = await moviesAPI.addMovies({
 				title: data?.title,
 				genre: data?.genre,
+				poster: data?.poster,
+				banner: data?.banner,
 				trailer: data?.trailer,
 				duration: data?.duration,
 				director: 'ok'
@@ -64,6 +70,8 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 		reset({
 			title: '',
 			genre: '',
+			poster: '',
+			banner: '',
 			trailer: '',
 			duration: ''
 		})
