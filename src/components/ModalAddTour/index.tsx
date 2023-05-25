@@ -5,15 +5,16 @@ import { useEffect } from "react"
 import { toast } from "react-toastify"
 import Modal from 'components/Modal'
 import userAPI from "@/services/users.service";
-import moviesAPI from "@/services/movies.service";
+import categoriesAPI from "@/services/categories.service";
+import tourAPI from "@/services/tours.service";
 
 const schema = yup.object().shape({
-	title: yup.string().required("Vui lòng nhập title"),
-	genre: yup.string().required("Vui lòng nhập genre"),
-	poster: yup.string().required("Vui lòng nhập poster"),
-	banner: yup.string().required("Vui lòng nhập banner"),
-	trailer:yup.string().required("Vui lòng nhập trailer"),
-	duration: yup.string().required("Vui lòng nhập duration")
+	tourName: yup.string().required("Vui lòng nhập tourName"),
+	description: yup.string().required("Vui lòng nhập description"),
+	capacity: yup.string().required("Vui lòng nhập capacity"),
+	startDate: yup.string().required("Vui lòng nhập startDate"),
+	endDate: yup.string().required("Vui lòng nhập endDate"),
+	price: yup.string().required("Vui lòng nhập price"),
 })
 
 type IProps = {
@@ -22,7 +23,8 @@ type IProps = {
 	callBack: () => void
 }
 
-const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
+const ModalAddTour = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
+
 	const {
 		register,
 		handleSubmit,
@@ -31,33 +33,32 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 	} = useForm({
 		resolver: yupResolver(schema),
 		defaultValues: {
-			title: '',
-			genre: '',
-			poster: '',
-			banner: '',
-			trailer: '',
-			duration: ''
+			tourName: '',
+			description: '',
+			capacity: '',
+			startDate: '',
+			endDate: '',
+			price: '',
 		}
 	})
 
 	const { errors, isDirty }: any = formState;
 
-	const addUser = async (data: any) => {
+	const addTour = async (data: any) => {
 		try {
-			const res = await moviesAPI.addMovies({
-				title: data?.title,
-				genre: data?.genre,
-				poster: data.poster,
-				banner: data.banner,
-				trailer: data?.trailer,
-				duration: data?.duration,
-				director: 'ok'
+			const res = await tourAPI.addTour({
+				tourName: data.tourName,
+				description: data.description,
+				capacity: data.capacity,
+				startDate: data.startDate,
+				endDate: data.endDate,
+				price: data.price,
 			})
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
 			} else {
 				callBack && callBack()
-				toast.success('Thêm phim thành công.')
+				toast.success('Thêm loại tour thành công.')
 				setShowModalAdd(false)
 			}
 		} catch (error) {
@@ -67,20 +68,20 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 
 	useEffect(() => {
 		reset({
-			title: '',
-			genre: '',
-			// poster: '',
-			// banner: '',
-			trailer: '',
-			duration: ''
+			tourName: '',
+			description: '',
+			capacity: '',
+			startDate: '',
+			endDate: '',
+			price: '',
 		})
 	}, [ setShowModalAdd, showModalAdd])
 	return (
 		<Modal
-			title="Thêm thông tin phim"
+			title="Thêm thông tin tour"
 			open={showModalAdd}
 			handleCancel={() => setShowModalAdd(false)}
-			handleConfirm={handleSubmit(addUser)}
+			handleConfirm={handleSubmit(addTour)}
 			className="w-full max-w-[475px]"
 			confirmButtonTitle="Lưu"
 		>
@@ -88,125 +89,127 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-						Tên phim:
+							Tên tour:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập tên phim"
+								placeholder="Nhập tên"
 								type="text"
-								{...register("title")}
+								{...register("tourName")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.title && (
+					{errors?.tourName && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.title?.message}
+							{errors?.tourName?.message}
 						</p>
 					)}
 				</div>
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Thể loại:
+						Description:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập thể loại"
+								placeholder="Nhập description"
 								type="text"
-								{...register("genre")}
+								{...register("description")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.genre && (
+					{errors?.description && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.genre?.message}
+							{errors?.description?.message}
 						</p>
 					)}
 				</div>
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Trailer:
+						Capacity:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập Trailer"
+								placeholder="Nhập Capacity"
 								type="text"
-								{...register("trailer")}
+								{...register("capacity")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.trailer && (
+					{errors?.capacity && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.trailer?.message}
-						</p>
-					)}
-				</div>
-				<div className="my-2">
-					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Độ dài:</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập Độ dài phim"
-								type="text"
-								{...register("duration")}
-								className="form-control w-full"
-							/>
-						</div>
-					</div>
-					{errors?.duration && (
-						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.duration?.message}
+							{errors?.capacity?.message}
 						</p>
 					)}
 				</div>
 
 				<div className="my-2">
 					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Poster:</span>
+						<span className="w-[140px] font-medium text-base">
+						Thời gian bắt đầu:
+						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập poster"
+								placeholder="Nhập thời gian bắt đầu"
 								type="text"
-								{...register("poster")}
+								{...register("startDate")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.poster && (
+					{errors?.startDate && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.poster?.message}
+							{errors?.startDate?.message}
 						</p>
 					)}
 				</div>
-
 				<div className="my-2">
 					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Banner:</span>
+						<span className="w-[140px] font-medium text-base">
+						  Thời gian kết thúc:
+						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập Banner"
+								placeholder="Nhập thời gian kết thúc"
 								type="text"
-								{...register("banner")}
+								{...register("endDate")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.banner && (
+					{errors?.endDate && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.banner?.message}
+							{errors?.endDate?.message}
 						</p>
 					)}
 				</div>
-
-
-
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập giá tiền"
+								type="text"
+								{...register("price")}
+								className="form-control w-full"
+							/>
+						</div>
+					</div>
+					{errors?.price && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.price?.message}
+						</p>
+					)}
+				</div>
 			</div>
 		</Modal>
 	)
 }
 
-export default ModalAddUser
+export default ModalAddTour

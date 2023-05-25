@@ -7,6 +7,7 @@ import Modal from 'components/Modal'
 import userAPI from "@/services/users.service";
 import { useAuth } from "@/contexts/auth";
 import moviesAPI from "@/services/movies.service";
+import cinemasAPI from "@/services/cinemas.service";
 
 type IProps = {
 	itemCinemas: Object | any
@@ -16,10 +17,9 @@ type IProps = {
 }
 
 const schema = yup.object().shape({
-	title: yup.string().required("Vui lòng nhập title"),
-	genre: yup.string().required("Vui lòng nhập genre"),
-	trailer:yup.string().required("Vui lòng nhập trailer"),
-	duration: yup.string().required("Vui lòng nhập duration")
+	name: yup.string().required("Vui lòng nhập name"),
+	address: yup.string().required("Vui lòng nhập address"),
+	city:yup.string().required("Vui lòng nhập city"),
 })
 
 const ModalEditCinemas = ({ showModalEdit, setShowModalEdit, itemCinemas, callBack }: IProps) => {
@@ -32,10 +32,9 @@ const ModalEditCinemas = ({ showModalEdit, setShowModalEdit, itemCinemas, callBa
 	} = useForm({
 		resolver: yupResolver(schema),
 		defaultValues: {
-			title: itemCinemas?.title,
-			genre: itemCinemas?.genre,
-			trailer: itemCinemas?.trailer,
-			duration: itemCinemas?.duration,
+			name: itemCinemas.name,
+			address: itemCinemas.address,
+			city:itemCinemas.city,
 		}
 	})
 
@@ -43,11 +42,10 @@ const ModalEditCinemas = ({ showModalEdit, setShowModalEdit, itemCinemas, callBa
 
 	const updatePost = async (data: any) => {
 		try {
-			const res = await moviesAPI.updateMovies(itemCinemas?.id, {
-				title: data?.title,
-				genre: data?.genre,
-				trailer: data?.trailer,
-				duration: data?.duration,
+			const res = await cinemasAPI.updateCinemas(itemCinemas?.id, {
+				name: data.name,
+				address: data.address,
+				city:data.city,
 			})
 			setShowModalEdit(false)
 			if (res?.data?.status === 'error') {
@@ -63,10 +61,9 @@ const ModalEditCinemas = ({ showModalEdit, setShowModalEdit, itemCinemas, callBa
 
 	useEffect(() => {
 		reset({
-			title: itemCinemas?.title,
-			genre: itemCinemas?.genre,
-			trailer: itemCinemas?.trailer,
-			duration: itemCinemas?.duration,
+			name: itemCinemas.name,
+			address: itemCinemas.address,
+			city:itemCinemas.city,
 		})
 	}, [itemCinemas, setShowModalEdit, showModalEdit])
 	return (
@@ -80,84 +77,66 @@ const ModalEditCinemas = ({ showModalEdit, setShowModalEdit, itemCinemas, callBa
 				confirmButtonTitle="Lưu"
 			>
 				<div className="flex flex-col">
-					<div className="my-2">
-						<div className="flex items-center">
-							<span className="w-[140px] font-medium text-base">
-								Tên phim:
-							</span>
-							<div className="flex-1">
-								<input
-									placeholder="Nhập tên phim"
-									type="text"
-									{...register("title")}
-									className="form-control w-full"
-								/>
-							</div>
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						Tên rạp:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập tên rạp"
+								type="text"
+								{...register("name")}
+								className="form-control w-full"
+							/>
 						</div>
-						{errors?.title && (
-							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-								{errors?.title?.message}
-							</p>
-						)}
 					</div>
-					<div className="my-2">
-						<div className="flex items-center">
-							<span className="w-[140px] font-medium text-base">
-								Thể loại:
-							</span>
-							<div className="flex-1">
-								<input
-									placeholder="Nhập Thể loại"
-									type="text"
-									{...register("genre")}
-									className="form-control w-full"
-								/>
-							</div>
+					{errors?.name && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.name?.message}
+						</p>
+					)}
+				</div>
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+							Địa chỉ:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập địa chỉ"
+								type="text"
+								{...register("address")}
+								className="form-control w-full"
+							/>
 						</div>
-						{errors?.genre && (
-							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-								{errors?.genre?.message}
-							</p>
-						)}
 					</div>
-					<div className="my-2">
-						<div className="flex items-center">
-							<span className="w-[140px] font-medium text-base">
-							Trailer:
-							</span>
-							<div className="flex-1">
-								<input
-									placeholder="Nhập Trailer"
-									type="text"
-									{...register("trailer")}
-									className="form-control w-full"
-								/>
-							</div>
+					{errors?.address && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.address?.message}
+						</p>
+					)}
+				</div>
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+							Thành phố:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập thành phố"
+								type="text"
+								{...register("city")}
+								className="form-control w-full"
+							/>
 						</div>
-						{errors?.trailer && (
-							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-								{errors?.trailer?.message}
-							</p>
-						)}
 					</div>
-					<div className="my-2">
-						<div className="flex items-center">
-							<span className="w-[140px] font-medium text-base">Độ dài:</span>
-							<div className="flex-1">
-								<input
-									placeholder="Nhập Độ dài"
-									type="text"
-									{...register("duration")}
-									className="form-control w-full"
-								/>
-							</div>
-						</div>
-						{errors?.duration && (
-							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-								{errors?.duration?.message}
-							</p>
-						)}
-					</div>
+					{errors?.city && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.city?.message}
+						</p>
+					)}
+				</div>
 
 				</div>
 			</Modal>

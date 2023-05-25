@@ -9,6 +9,7 @@ import { toast } from 'react-toastify'
 import ModalEditMovies from '@/components/ModalEditMovies'
 import ModalAddMovies from '@/components/ModalAddMovies'
 import moviesAPI from '@/services/movies.service'
+import useQueryParams from '@/hooks/useQueryParams'
 
 const Movies = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
@@ -17,11 +18,15 @@ const Movies = () => {
   const [itemMovies, setItemMovies] = useState<any>({});
   const [idMovies, setIdMovies] = useState<any>();
   const [movies, setMovies] = useState<any>([]);
+	const [totalItem, setTotalItem] = useState<number>(0);
+	const [params, setQueryParams] = useQueryParams()
+	const { page, size, _q} = params
 
   const getDataListMovies = async () => {
     try {
-      const data = await moviesAPI.getMovies()
+      const data = await moviesAPI.getMovies({page, size, _q})
       setMovies(data?.data?.data)
+			setTotalItem(data?.data?.total)
     } catch (error) {
       console.log(error)
     }
@@ -42,6 +47,19 @@ const Movies = () => {
 		}
   }
 
+	const searchMovies = async () => {
+		setQueryParams({
+			...params, page: 1, size: size
+		}, true)
+		try {
+      const data = await moviesAPI.getMovies({page, size, _q})
+      setMovies(data?.data?.data)
+			setTotalItem(data?.data?.total)
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
   const handleStatus = (id: any) => {
 		setShowModalDelete(true)
     setIdMovies(id)
@@ -52,9 +70,17 @@ const Movies = () => {
 		setItemMovies(item)
 	}
 
+	useEffect(() => {
+		if(_q){
+	 getDataListMovies()
+		}
+ }, [page, size])
+
   useEffect(() => {
+		 if(!_q){
     getDataListMovies()
-  }, [])
+		 }
+  }, [page, size, _q])
 
   return (
     <>
@@ -104,7 +130,7 @@ const Movies = () => {
 											<div className="flex items-center gap-5 flex-wrap justify-end">
 												<div className="w-60 relative text-slate-500">
 													<InputSearchDebounce
-                            onChange={() => null}
+														onChange={(input: string) => setQueryParams({ ...params, page: page, size: size, _q: input?.trim() }, true)}
 														placeholder="Từ khóa"
 														className="form-control box pr-10 w-56 flex-end"
 														delay={400}
@@ -112,7 +138,7 @@ const Movies = () => {
 												</div>
 
 												<div>
-													<button className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
+													<button onClick={searchMovies} className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
 														Tìm
 													</button>
 												</div>
@@ -183,13 +209,13 @@ const Movies = () => {
         </div>
       </div>
       <div className="flex justify-between w-full mt-10">
-        <Pagination
-          pageNumber={1}
-          pageSize={1}
-          totalRow={1}
-          onPageChange={() => null}
-          onChangePageSize={() => null}
-        />
+			<Pagination
+									pageNumber={page}
+									pageSize={size}
+									totalRow={totalItem}
+									onPageChange={(page) => setQueryParams({ page })}
+									onChangePageSize={(limit) => setQueryParams({ limit })}
+								/>
       </div>
     </>
   )

@@ -1,5 +1,5 @@
 import { CommonResponse } from "models/common";
-import { getAsync, patchAsync, deleteAsync, postAsync } from "./request";
+import { getAsync, patchAsync, deleteAsync, postAsync, putAsync } from "./request";
 
 const cinemasAPI = {
 	getCinemas(params?: any): Promise<CommonResponse> {
@@ -15,7 +15,7 @@ const cinemasAPI = {
     params: any
   ): Promise<CommonResponse> {
     const url = `/v1/cinemas/${id}`
-    return patchAsync(url, params)
+    return putAsync(url, params)
   },
 	deleteCinemas(
     id: string

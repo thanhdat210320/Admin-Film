@@ -6,12 +6,12 @@ import { toast } from "react-toastify"
 import Modal from 'components/Modal'
 import userAPI from "@/services/users.service";
 import moviesAPI from "@/services/movies.service";
+import cinemasAPI from "@/services/cinemas.service";
 
 const schema = yup.object().shape({
-	title: yup.string().required("Vui lòng nhập title"),
-	genre: yup.string().required("Vui lòng nhập genre"),
-	trailer:yup.string().required("Vui lòng nhập trailer"),
-	duration: yup.string().required("Vui lòng nhập duration")
+	name: yup.string().required("Vui lòng nhập name"),
+	address: yup.string().required("Vui lòng nhập address"),
+	city:yup.string().required("Vui lòng nhập city"),
 })
 
 type IProps = {
@@ -30,10 +30,9 @@ const ModalAddCinemas = ({ setShowModalAdd, showModalAdd, callBack }: IProps) =>
 	} = useForm({
 		resolver: yupResolver(schema),
 		defaultValues: {
-			title: '',
-			genre: '',
-			trailer: '',
-			duration: ''
+			name: '',
+			address: '',
+			city: '',
 		}
 	})
 
@@ -41,18 +40,16 @@ const ModalAddCinemas = ({ setShowModalAdd, showModalAdd, callBack }: IProps) =>
 
 	const addUser = async (data: any) => {
 		try {
-			const res = await moviesAPI.addMovies({
-				title: data?.title,
-				genre: data?.genre,
-				trailer: data?.trailer,
-				duration: data?.duration,
-				director: 'ok'
+			const res = await cinemasAPI.addCinemas({
+				name: data.name,
+				address: data.address,
+				city: data.city,
 			})
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
 			} else {
 				callBack && callBack()
-				toast.success('Thêm phim thành công.')
+				toast.success('Thêm rạp thành công.')
 				setShowModalAdd(false)
 			}
 		} catch (error) {
@@ -62,10 +59,9 @@ const ModalAddCinemas = ({ setShowModalAdd, showModalAdd, callBack }: IProps) =>
 
 	useEffect(() => {
 		reset({
-			title: '',
-			genre: '',
-			trailer: '',
-			duration: ''
+			name: '',
+			address: '',
+			city: '',
 		})
 	}, [ setShowModalAdd, showModalAdd])
 	return (
@@ -81,84 +77,63 @@ const ModalAddCinemas = ({ setShowModalAdd, showModalAdd, callBack }: IProps) =>
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-						Tên phim:
+						Tên rạp:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập tên phim"
+								placeholder="Nhập tên rạp"
 								type="text"
-								{...register("title")}
+								{...register("name")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.title && (
+					{errors?.name && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.title?.message}
+							{errors?.name?.message}
 						</p>
 					)}
 				</div>
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Thể loại:
+							Địa chỉ:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập thể loại"
+								placeholder="Nhập địa chỉ"
 								type="text"
-								{...register("genre")}
+								{...register("address")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.genre && (
+					{errors?.address && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.genre?.message}
+							{errors?.address?.message}
 						</p>
 					)}
 				</div>
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Trailer:
+							Thành phố:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập Trailer"
+								placeholder="Nhập thành phố"
 								type="text"
-								{...register("trailer")}
+								{...register("city")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.trailer && (
+					{errors?.city && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.trailer?.message}
+							{errors?.city?.message}
 						</p>
 					)}
 				</div>
-				<div className="my-2">
-					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Độ dài:</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập Độ dài phim"
-								type="text"
-								{...register("duration")}
-								className="form-control w-full"
-							/>
-						</div>
-					</div>
-					{errors?.duration && (
-						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.duration?.message}
-						</p>
-					)}
-				</div>
-
-
-
 			</div>
 		</Modal>
 	)

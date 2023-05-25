@@ -9,6 +9,7 @@ import { toast } from 'react-toastify'
 import ModalEditCinemas from '@/components/ModalEditCinemas'
 import ModalAddCinemas from '@/components/ModalAddCinemas'
 import cinemasAPI from '@/services/cinemas.service'
+import useQueryParams from '@/hooks/useQueryParams'
 
 const Cinemas = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
@@ -17,11 +18,15 @@ const Cinemas = () => {
   const [itemCinemas, setItemCinemas] = useState<any>({});
   const [idCinemas, setIdCinemas] = useState<any>();
   const [cinemas, setCinemas] = useState<any>([]);
+	const [totalItem, setTotalItem] = useState<number>(0);
+	const [params, setQueryParams] = useQueryParams()
+	const { page, size, _q} = params
 
   const getDataListCinemas = async () => {
     try {
-      const data = await cinemasAPI.getCinemas()
+      const data = await cinemasAPI.getCinemas({page, size, _q})
       setCinemas(data?.data?.data)
+			setTotalItem(data?.data?.total)
     } catch (error) {
       console.log(error)
     }
@@ -42,6 +47,20 @@ const Cinemas = () => {
 		}
   }
 
+
+	const searchCinemas = async () => {
+		setQueryParams({
+			...params, page: 1, size: size
+		}, true)
+		try {
+      const data = await cinemasAPI.getCinemas({page, size, _q})
+      setCinemas(data?.data?.data)
+			setTotalItem(data?.data?.total)
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
   const handleStatus = (id: any) => {
 		setShowModalDelete(true)
     setIdCinemas(id)
@@ -52,9 +71,17 @@ const Cinemas = () => {
 		setItemCinemas(item)
 	}
 
+	useEffect(() => {
+		if(_q){
+			getDataListCinemas()
+		}
+ }, [page, size])
+
   useEffect(() => {
-    getDataListCinemas()
-  }, [])
+		 if(!_q){
+			getDataListCinemas()
+		 }
+  }, [page, size, _q])
 
   return (
     <>
@@ -74,7 +101,7 @@ const Cinemas = () => {
 				}}
 			/>
       <Modal
-				title="Xóa user"
+				title="Xóa cinemas"
 				open={showModalDelete}
 				handleCancel={() => setShowModalDelete(false)}
 				handleConfirm={handleConfirmDelete}
@@ -104,7 +131,7 @@ const Cinemas = () => {
 											<div className="flex items-center gap-5 flex-wrap justify-end">
 												<div className="w-60 relative text-slate-500">
 													<InputSearchDebounce
-                            onChange={() => null}
+                           onChange={(input: string) => setQueryParams({ ...params, page: page, size: size, _q: input?.trim() }, true)}
 														placeholder="Từ khóa"
 														className="form-control box pr-10 w-56 flex-end"
 														delay={400}
@@ -112,7 +139,7 @@ const Cinemas = () => {
 												</div>
 
 												<div>
-													<button className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
+													<button onClick={searchCinemas} className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
 														Tìm
 													</button>
 												</div>
@@ -128,6 +155,8 @@ const Cinemas = () => {
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
                               <th className="whitespace-nowrap">Tên</th>
+															<th className="whitespace-nowrap">Địa chỉ</th>
+															<th className="whitespace-nowrap">Thành phố</th>
                               <th className="whitespace-nowrap">Chức năng</th>
                             </tr>
                           </thead>
@@ -139,6 +168,8 @@ const Cinemas = () => {
                                     <tr className="text-center">
                                       <td>{item.id}</td>
                                       <td>{item.name}</td>
+																			<td>{item.address}</td>
+																			<td>{item.city}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
                                         <div className="flex items-center justify-around">
                                           <div className="cursor-pointer font-semibold text-sky-600 hover:opacity-60 flex items-center" onClick={() => handleUpdate(item)}>
@@ -173,13 +204,13 @@ const Cinemas = () => {
         </div>
       </div>
       <div className="flex justify-between w-full mt-10">
-        <Pagination
-          pageNumber={1}
-          pageSize={1}
-          totalRow={1}
-          onPageChange={() => null}
-          onChangePageSize={() => null}
-        />
+			<Pagination
+									pageNumber={page}
+									pageSize={size}
+									totalRow={totalItem}
+									onPageChange={(page) => setQueryParams({ page })}
+									onChangePageSize={(limit) => setQueryParams({ limit })}
+								/>
       </div>
     </>
   )

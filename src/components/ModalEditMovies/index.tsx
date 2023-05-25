@@ -18,6 +18,8 @@ type IProps = {
 const schema = yup.object().shape({
 	title: yup.string().required("Vui lòng nhập title"),
 	genre: yup.string().required("Vui lòng nhập genre"),
+	poster: yup.string().required("Vui lòng nhập poster"),
+	banner: yup.string().required("Vui lòng nhập banner"),
 	trailer:yup.string().required("Vui lòng nhập trailer"),
 	duration: yup.string().required("Vui lòng nhập duration")
 })
@@ -34,6 +36,8 @@ const ModalEditUser = ({ showModalEdit, setShowModalEdit, itemMovies, callBack }
 		defaultValues: {
 			title: itemMovies?.title,
 			genre: itemMovies?.genre,
+			poster: itemMovies.poster,
+			banner: itemMovies.banner,
 			trailer: itemMovies?.trailer,
 			duration: itemMovies?.duration,
 		}
@@ -46,6 +50,8 @@ const ModalEditUser = ({ showModalEdit, setShowModalEdit, itemMovies, callBack }
 			const res = await moviesAPI.updateMovies(itemMovies?.id, {
 				title: data?.title,
 				genre: data?.genre,
+				poster: data?.poster,
+				banner: data?.banner,
 				trailer: data?.trailer,
 				duration: data?.duration,
 			})
@@ -65,6 +71,8 @@ const ModalEditUser = ({ showModalEdit, setShowModalEdit, itemMovies, callBack }
 		reset({
 			title: itemMovies?.title,
 			genre: itemMovies?.genre,
+			poster: itemMovies.poster,
+			banner: itemMovies.banner,
 			trailer: itemMovies?.trailer,
 			duration: itemMovies?.duration,
 		})
@@ -155,6 +163,42 @@ const ModalEditUser = ({ showModalEdit, setShowModalEdit, itemMovies, callBack }
 						{errors?.duration && (
 							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
 								{errors?.duration?.message}
+							</p>
+						)}
+					</div>
+					<div className="my-2">
+						<div className="flex items-center">
+							<span className="w-[140px] font-medium text-base">Poster:</span>
+							<div className="flex-1">
+								<input
+									placeholder="Nhập Poster"
+									type="text"
+									{...register("poster")}
+									className="form-control w-full"
+								/>
+							</div>
+						</div>
+						{errors?.poster && (
+							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+								{errors?.poster?.message}
+							</p>
+						)}
+					</div>
+					<div className="my-2">
+						<div className="flex items-center">
+							<span className="w-[140px] font-medium text-base">Banner:</span>
+							<div className="flex-1">
+								<input
+									placeholder="Nhập Banner"
+									type="text"
+									{...register("banner")}
+									className="form-control w-full"
+								/>
+							</div>
+						</div>
+						{errors?.banner && (
+							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+								{errors?.banner?.message}
 							</p>
 						)}
 					</div>
