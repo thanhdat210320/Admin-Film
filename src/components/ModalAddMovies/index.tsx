@@ -1,19 +1,24 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import Modal from 'components/Modal'
-import userAPI from "@/services/users.service";
 import moviesAPI from "@/services/movies.service";
+import cinemasAPI from "@/services/cinemas.service";
+import useQueryParams from "@/hooks/useQueryParams";
+import { getCachedData } from "@/utils/storage";
+import { ACCESS_TOKEN } from "@/contants/auth";
+import axios from "axios";
 
 const schema = yup.object().shape({
 	title: yup.string().required("Vui lòng nhập title"),
-	genre: yup.string().required("Vui lòng nhập genre"),
-	poster: yup.string().required("Vui lòng nhập poster"),
-	banner: yup.string().required("Vui lòng nhập banner"),
-	trailer:yup.string().required("Vui lòng nhập trailer"),
-	duration: yup.string().required("Vui lòng nhập duration")
+	descristion: yup.string().required("Vui lòng nhập description"),
+	duration: yup.number().typeError("Trường này bắt buộc nhập số").required("Trường này bắt buộc nhập"),
+	director: yup.string().required("Vui lòng nhập startDate"),
+	cinemaId: yup.string().required("Vui lòng nhập cateId"),
+	genre: yup.number().typeError("Trường này bắt buộc nhập số").required("Trường này bắt buộc nhập"),
+	trailer: yup.string().required("Vui lòng nhập transport")
 })
 
 type IProps = {
@@ -22,7 +27,13 @@ type IProps = {
 	callBack: () => void
 }
 
-const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
+const ModalAddMovies = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
+	const [poster, setPoster] = useState<any>(null);
+	const [banner, setBanner] = useState<any>(null);
+  const [categories, setCategories] = useState<any>([])
+	const [params, setQueryParams] = useQueryParams()
+	const { page, limit, category } = params
+
 	const {
 		register,
 		handleSubmit,
@@ -32,67 +43,100 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 		resolver: yupResolver(schema),
 		defaultValues: {
 			title: '',
+			descristion: '',
+			duration: '',
+			director: '',
+			cinemaId: '',
 			genre: '',
-			poster: '',
-			banner: '',
-			trailer: '',
-			duration: ''
+			trailer: ''
 		}
 	})
 
 	const { errors, isDirty }: any = formState;
+	const accessToken = getCachedData(ACCESS_TOKEN)
 
-	const addUser = async (data: any) => {
-		try {
-			const res = await moviesAPI.addMovies({
-				title: data?.title,
-				genre: data?.genre,
-				poster: data.poster,
-				banner: data.banner,
-				trailer: data?.trailer,
-				duration: data?.duration,
-				director: 'ok'
-			})
-			if (res?.data?.status === 'error') {
-				toast.error(res?.data?.message)
-			} else {
-				callBack && callBack()
-				toast.success('Thêm phim thành công.')
-				setShowModalAdd(false)
-			}
-		} catch (error) {
-			console.log(error)
+	const addTour = async (data: any) => {
+		const formData = new FormData()
+		formData.append("title", data.title)
+		formData.append("descristion", data.descristion)
+		formData.append("duration", data.duration)
+		formData.append("banner", banner) //flie của banner
+		formData.append("poster", poster) //file của poster
+		formData.append("director", data.director)
+		formData.append("cinemaId", data.cinemaId)
+		formData.append("price", '0')
+		formData.append("genre", data.genre)
+		formData.append("trailer", data.trailer)
+	try {
+		const res = await axios({
+			method: 'post',
+			url: 'http://localhost:8228/v1/movies',
+			headers: {
+				Authorization: 'Bearer ' + accessToken, //the token is a variable which holds the token
+				"Content-Type": `multipart/form-data; boundary=${formData}`
+			},
+			data: formData
+		})
+		//check lại res
+		if (res?.data?.status === 'error') {
+			toast.error(res?.data?.message)
+		} else {
+			callBack && callBack()
+			toast.success('Thêm phim thành công.')
+			setShowModalAdd(false)
+			setBanner(null)
+			setPoster(null)
 		}
+	} catch (error) {
+		console.log(error)
 	}
+}
+
+
+	const getDataListCinemas = async () => {
+		try {
+		  const data = await cinemasAPI.getCinemas({size: 999})
+		  setCategories(data?.data?.data)
+		} catch (error) {
+		  console.log(error)
+		}
+	  }
+
+	  useEffect(() => {
+			getDataListCinemas()
+	},[])
 
 	useEffect(() => {
 		reset({
 			title: '',
+			descristion: '',
+			duration: '',
+			director: '',
+			cinemaId: '',
 			genre: '',
-			// poster: '',
-			// banner: '',
-			trailer: '',
-			duration: ''
+			trailer: ''
 		})
 	}, [ setShowModalAdd, showModalAdd])
 	return (
 		<Modal
-			title="Thêm thông tin phim"
+			title="Thêm thông tin tour"
 			open={showModalAdd}
 			handleCancel={() => setShowModalAdd(false)}
-			handleConfirm={handleSubmit(addUser)}
-			className="w-full max-w-[475px]"
+			handleConfirm={handleSubmit(addTour)}
+			className="w-full max-w-[875px]"
 			confirmButtonTitle="Lưu"
 		>
 			<div className="flex flex-col">
+				<div className="flex justify-between">
+				<div className="w-[48%]">
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-						Tên phim:
+							Tên tour:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập tên phim"
+								placeholder="Nhập tên"
 								type="text"
 								{...register("title")}
 								className="form-control w-full"
@@ -108,31 +152,82 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Thể loại:
+						Description:
 						</span>
 						<div className="flex-1">
-							<input
-								placeholder="Nhập thể loại"
-								type="text"
-								{...register("genre")}
+							<textarea
+								placeholder="Nhập description"
+								{...register("descristion")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.genre && (
+					{errors?.descristion && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.genre?.message}
+							{errors?.descristion?.message}
 						</p>
 					)}
 				</div>
 				<div className="my-2">
+					<div className="flex items-center ">
+							<label className="w-[140px] font-medium text-base">Loại tour: </label>
+							<div className="flex-1">
+							<select {...register("cinemaId")} id="crud-form-1" className="form-control w-full">
+							<option value="" className="hidden" selected >Nhập rạp chiếu</option>
+									{
+										categories?.map((cate: any) => (
+												<option key={cate?.id} value={cate?.id}>{cate?.name}</option>
+										))
+									}
+								</select>
+									</div>
+						</div>
+						{errors?.cinemaId && (
+							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+								{errors?.cinemaId?.message}
+							</p>
+						)}
+					</div>
+
+					<div className="my-2 h-[80px] flex items-center">
+				<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+							Chọn banner:
+						</span>
+						<div className=" w-[69%] flex items-center justify-between">
+							<input type="file" accept=".png,.jpeg,.jpg" onChange={(e: any) => setBanner(e?.target?.files[0])} />
+							{banner && (<><img src={URL.createObjectURL(banner)} className="w-[80px] h-[80px]" alt="" />
+								<div className="shareX ml-[10px] cursor-pointer" onClick={() => setBanner(null)}>X</div></>
+							)}
+						</div>
+					</div>
+				</div>
+				<div className="my-2  h-[80px] flex items-center">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Trailer:
+							Chọn poster:
+						</span>
+						<div className=" w-[69%] flex items-center justify-between">
+							<input type="file" accept=".png,.jpeg,.jpg" onChange={(e: any) => setPoster(e?.target?.files[0])} />
+							{poster && (<><img src={URL.createObjectURL(poster)} className="w-[80px] h-[80px]" alt="" />
+								<div className="shareX ml-[10px] cursor-pointer" onClick={() => setPoster(null)}>X</div></>
+							)}
+						</div>
+					</div>
+				</div>
+
+				</div>
+				<div className="w-[48%]">
+
+
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập Trailer"
+								placeholder="Nhập giá tiền"
 								type="text"
 								{...register("trailer")}
 								className="form-control w-full"
@@ -147,10 +242,53 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 				</div>
 				<div className="my-2">
 					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Độ dài:</span>
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
+						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập Độ dài phim"
+								placeholder="Nhập giá tiền"
+								type="text"
+								{...register("genre")}
+								className="form-control w-full"
+							/>
+						</div>
+					</div>
+					{errors?.genre && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.genre?.message}
+						</p>
+					)}
+				</div>
+
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập giá tiền"
+								type="text"
+								{...register("director")}
+								className="form-control w-full"
+							/>
+						</div>
+					</div>
+					{errors?.director && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.director?.message}
+						</p>
+					)}
+				</div>
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập giá tiền"
 								type="text"
 								{...register("duration")}
 								className="form-control w-full"
@@ -163,50 +301,11 @@ const ModalAddUser = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 						</p>
 					)}
 				</div>
-
-				<div className="my-2">
-					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Poster:</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập poster"
-								type="text"
-								{...register("poster")}
-								className="form-control w-full"
-							/>
-						</div>
-					</div>
-					{errors?.poster && (
-						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.poster?.message}
-						</p>
-					)}
 				</div>
-
-				<div className="my-2">
-					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Banner:</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập Banner"
-								type="text"
-								{...register("banner")}
-								className="form-control w-full"
-							/>
-						</div>
-					</div>
-					{errors?.banner && (
-						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.banner?.message}
-						</p>
-					)}
 				</div>
-
-
-
 			</div>
 		</Modal>
 	)
 }
 
-export default ModalAddUser
+export default ModalAddMovies

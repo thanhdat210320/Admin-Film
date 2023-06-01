@@ -1,19 +1,23 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import Modal from 'components/Modal'
-import userAPI from "@/services/users.service";
-import categoriesAPI from "@/services/categories.service";
-import tourAPI from "@/services/tours.service";
+import moviesAPI from "@/services/movies.service";
+import cinemasAPI from "@/services/cinemas.service";
+import useQueryParams from "@/hooks/useQueryParams";
 
 const schema = yup.object().shape({
-	tourName: yup.string().required("Vui lòng nhập tourName"),
+	title: yup.string().required("Vui lòng nhập title"),
 	description: yup.string().required("Vui lòng nhập description"),
-	capacity: yup.string().required("Vui lòng nhập capacity"),
-	startDate: yup.string().required("Vui lòng nhập startDate"),
-	endDate: yup.string().required("Vui lòng nhập endDate"),
+	duration: yup.number().typeError("Trường này bắt buộc nhập số").required("Trường này bắt buộc nhập"),
+	director: yup.string().required("Vui lòng nhập startDate"),
+	banner: yup.string().required("Vui lòng nhập endDate"),
+	cinemaId: yup.string().required("Vui lòng nhập cateId"),
+	genre: yup.number().typeError("Trường này bắt buộc nhập số").required("Trường này bắt buộc nhập"),
+	poster: yup.string().required("Vui lòng nhập transport"),
+	trailer: yup.string().required("Vui lòng nhập transport"),
 	price: yup.string().required("Vui lòng nhập price"),
 })
 
@@ -24,6 +28,11 @@ type IProps = {
 }
 
 const ModalAddTour = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
+	const [poster, setPoster] = useState<any>(null);
+	const [banner, setBanner] = useState<any>(null);
+  const [categories, setCategories] = useState<any>([])
+	const [params, setQueryParams] = useQueryParams()
+	const { page, limit, category } = params
 
 	const {
 		register,
@@ -33,11 +42,15 @@ const ModalAddTour = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 	} = useForm({
 		resolver: yupResolver(schema),
 		defaultValues: {
-			tourName: '',
+			title: '',
 			description: '',
-			capacity: '',
-			startDate: '',
-			endDate: '',
+			duration: '',
+			director: '',
+			banner: '',
+			cinemaId: '',
+			genre: '',
+			poster: '',
+			trailer: '',
 			price: '',
 		}
 	})
@@ -46,13 +59,17 @@ const ModalAddTour = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 
 	const addTour = async (data: any) => {
 		try {
-			const res = await tourAPI.addTour({
-				tourName: data.tourName,
-				description: data.description,
-				capacity: data.capacity,
-				startDate: data.startDate,
-				endDate: data.endDate,
-				price: data.price,
+			const res = await moviesAPI.addMovies({
+				title: data?.title,
+				description: data?.description,
+				duration: data?.duration,
+				director: data?.director,
+				banner: data?.banner,
+				cinemaId: data?.cinemaId,
+				genre: data?.genre,
+				poster: data?.poster,
+				trailer: data?.trailer,
+				price: data?.price
 			})
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
@@ -66,13 +83,31 @@ const ModalAddTour = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 		}
 	}
 
+
+	const getDataListCinemas = async () => {
+		try {
+		  const data = await cinemasAPI.getCinemas({size: 999})
+		  setCategories(data?.data?.data)
+		} catch (error) {
+		  console.log(error)
+		}
+	  }
+
+	  useEffect(() => {
+			getDataListCinemas()
+	},[])
+
 	useEffect(() => {
 		reset({
-			tourName: '',
+			title: '',
 			description: '',
-			capacity: '',
-			startDate: '',
-			endDate: '',
+			duration: '',
+			director: '',
+			banner: '',
+			cinemaId: '',
+			genre: '',
+			poster: '',
+			trailer: '',
 			price: '',
 		})
 	}, [ setShowModalAdd, showModalAdd])
@@ -95,14 +130,14 @@ const ModalAddTour = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 							<input
 								placeholder="Nhập tên"
 								type="text"
-								{...register("tourName")}
+								{...register("title")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.tourName && (
+					{errors?.title && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.tourName?.message}
+							{errors?.title?.message}
 						</p>
 					)}
 				</div>
@@ -127,46 +162,26 @@ const ModalAddTour = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 					)}
 				</div>
 				<div className="my-2">
-					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">
-						Capacity:
-						</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập Capacity"
-								type="text"
-								{...register("capacity")}
-								className="form-control w-full"
-							/>
+					<div className="flex items-center ">
+							<label className="w-[140px] font-medium text-base">Loại tour: </label>
+							<div className="flex-1">
+							<select {...register("cinemaId")} id="crud-form-1" className="form-control w-full">
+							<option value="" className="hidden" selected >Nhập rạp chiếu</option>
+									{
+										categories?.map((cate: any) => (
+												<option key={cate?.id} value={cate?.id}>{cate?.name}</option>
+										))
+									}
+								</select>
+									</div>
 						</div>
+						{errors?.cinemaId && (
+							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+								{errors?.cinemaId?.message}
+							</p>
+						)}
 					</div>
-					{errors?.capacity && (
-						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.capacity?.message}
-						</p>
-					)}
-				</div>
 
-				<div className="my-2">
-					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">
-						Thời gian bắt đầu:
-						</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập thời gian bắt đầu"
-								type="text"
-								{...register("startDate")}
-								className="form-control w-full"
-							/>
-						</div>
-					</div>
-					{errors?.startDate && (
-						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.startDate?.message}
-						</p>
-					)}
-				</div>
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
@@ -176,14 +191,34 @@ const ModalAddTour = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 							<input
 								placeholder="Nhập thời gian kết thúc"
 								type="text"
-								{...register("endDate")}
+								{...register("poster")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.endDate && (
+					{errors?.poster && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.endDate?.message}
+							{errors?.poster?.message}
+						</p>
+					)}
+				</div>
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập giá tiền"
+								type="text"
+								{...register("banner")}
+								className="form-control w-full"
+							/>
+						</div>
+					</div>
+					{errors?.banner && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.banner?.message}
 						</p>
 					)}
 				</div>
@@ -204,6 +239,89 @@ const ModalAddTour = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
 					{errors?.price && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
 							{errors?.price?.message}
+						</p>
+					)}
+				</div>
+
+
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập giá tiền"
+								type="text"
+								{...register("trailer")}
+								className="form-control w-full"
+							/>
+						</div>
+					</div>
+					{errors?.trailer && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.trailer?.message}
+						</p>
+					)}
+				</div>
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập giá tiền"
+								type="text"
+								{...register("genre")}
+								className="form-control w-full"
+							/>
+						</div>
+					</div>
+					{errors?.genre && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.genre?.message}
+						</p>
+					)}
+				</div>
+
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập giá tiền"
+								type="text"
+								{...register("director")}
+								className="form-control w-full"
+							/>
+						</div>
+					</div>
+					{errors?.director && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.director?.message}
+						</p>
+					)}
+				</div>
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">
+						 Giá tiền:
+						</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập giá tiền"
+								type="text"
+								{...register("duration")}
+								className="form-control w-full"
+							/>
+						</div>
+					</div>
+					{errors?.duration && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.duration?.message}
 						</p>
 					)}
 				</div>

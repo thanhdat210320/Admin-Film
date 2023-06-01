@@ -3,26 +3,30 @@ import { getAsync, patchAsync, deleteAsync, postAsync, putAsync } from "./reques
 
 const bookingsAPI = {
 	getBookings(params?: any): Promise<CommonResponse> {
-		const url = "/v1/bookings"
+		const url = "/bookings"
 		return getAsync(url, params);
 	},
 	addBookings( params: any): Promise<CommonResponse> {
-		const url = "/v1/bookings"
+		const url = "/bookings"
 		return postAsync(url, params);
 	},
 	updateBookings(
     id: string,
     params: any
   ): Promise<CommonResponse> {
-    const url = `/v1/bookings/${id}`
+    const url = `/bookings/${id}`
     return putAsync(url, params)
   },
 	deleteBookings(
     id: string
   ): Promise<CommonResponse> {
-    const url = `/v1/bookings/delete/${id}`
+    const url = `/bookings/delete/${id}`
     return deleteAsync(url)
-  }
+  },
+	getMoviesBooinges(params?: any): Promise<CommonResponse> {
+		const url = "/bookings/MoviesBooingest"
+		return getAsync(url, params);
+	},
 };
 
 export default bookingsAPI;

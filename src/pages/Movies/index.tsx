@@ -10,6 +10,7 @@ import ModalEditMovies from '@/components/ModalEditMovies'
 import ModalAddMovies from '@/components/ModalAddMovies'
 import moviesAPI from '@/services/movies.service'
 import useQueryParams from '@/hooks/useQueryParams'
+import cinemasAPI from '@/services/cinemas.service'
 
 const Movies = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
@@ -23,9 +24,21 @@ const Movies = () => {
 	const { page, size, _q} = params
 
   const getDataListMovies = async () => {
-    try {
-      const data = await moviesAPI.getMovies({page, size, _q})
-      setMovies(data?.data?.data)
+		try {
+      const [data, cinemas ] = await Promise.all([
+				moviesAPI.getMovies({ page: page, _q: _q, size: size}),
+				cinemasAPI.getCinemas({ page: 1, size: 999})
+			])
+
+			console.log(data, cinemas)
+
+			const newData: any = data?.data?.data?.map((item: any) => {
+				return {
+					...item,
+					cinemasName: cinemas?.data?.data?.find((itemCate: any) => itemCate?.id === item?.cinemaId)?.name
+				}
+			})
+      setMovies(newData)
 			setTotalItem(data?.data?.total)
     } catch (error) {
       console.log(error)
@@ -154,8 +167,10 @@ const Movies = () => {
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
                               <th className="whitespace-nowrap">Tên</th>
+															<th className="whitespace-nowrap">Rạp chiếu</th>
 															<th className="whitespace-nowrap">Poster</th>
 															<th className="whitespace-nowrap">Banner</th>
+															<th className="whitespace-nowrap">Nội dung</th>
 															<th className="whitespace-nowrap">Trailer</th>
                               <th className="whitespace-nowrap">Thể loại</th>
                               <th className="whitespace-nowrap">Độ dài</th>
@@ -170,8 +185,10 @@ const Movies = () => {
                                     <tr className="text-center">
                                       <td>{item.id}</td>
                                       <td>{item.title}</td>
-																			<td><img src={item.poster} alt="" /></td>
-																			<td><img src={item.banner} alt="" /></td>
+																			<td>{item.cinemasName}</td>
+																			<td><img src={`http://localhost:8228/files/${item.poster}`} alt="" /></td>
+																			<td><img src={`http://localhost:8228/files/${item.banner}`} alt="" /></td>
+																			<td><p className='w-[200px] truncate' title={item.descristion}>{item.descristion}</p></td>
 																			<td>{item.trailer}</td>
                                       <td>{item.genre}</td>
                                       <td>{item.duration}p</td>
