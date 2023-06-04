@@ -3,26 +3,28 @@ import InputSearchDebounce from 'components/Form/InputSearchDebounce'
 import Pagination from 'components/Pagination'
 import 'react-datepicker/dist/react-datepicker.css'
 import ReactSelect from 'react-select'
-import { Edit, Plus, X } from 'lucide-react'
+import { Edit, Plus, Trash2, X } from 'lucide-react'
 import Modal from '@/components/Modal'
 import { toast } from 'react-toastify'
-import ticketAPI from '@/services/tickets.service'
-import ModalEditReviews from '@/components/ModalEditReviews'
-import ModalAddReviews from '@/components/ModalAddReviews'
-import reviewsAPI from '@/services/reviews.service'
+import reviewAPI from '@/services/reviews.service'
+import dayjs from 'dayjs'
+import useQueryParams from '@/hooks/useQueryParams'
+import { useAuth } from '@/contexts/auth'
 
-const Ticket = () => {
-	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
+const Reviews = () => {
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
-  const [showModalEdit, setShowModalEdit] = useState<boolean>(false);
-  const [itemReviews, setItemReviews] = useState<any>({});
   const [idReviews, setIdReviews] = useState<any>();
   const [reviews, setReviews] = useState<any>([]);
+	const [totalItem, setTotalItem] = useState<number>(0);
+	const [params, setQueryParams] = useQueryParams()
+	const { page, size, _q } = params
+	const { user } = useAuth()
 
   const getDataListReviews = async () => {
     try {
-      const data = await reviewsAPI.getReviews()
+      const data = await reviewAPI.getReviews({ page: page, _q: _q, size: size})
       setReviews(data?.data?.data)
+			setTotalItem(data?.data?.total)
     } catch (error) {
       console.log(error)
     }
@@ -30,7 +32,7 @@ const Ticket = () => {
 
   const handleConfirmDelete = async () => {
     try {
-			const res = await reviewsAPI.deleteReviews(idReviews)
+			const res = await reviewAPI.deleteReviews(idReviews)
 			setShowModalDelete(false)
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
@@ -43,50 +45,57 @@ const Ticket = () => {
 		}
   }
 
+	const searchReviews = async () => {
+		setQueryParams({
+			...params, page: 1, size: size
+		}, true)
+    try {
+      const data = await reviewAPI.getReviews({ page: page, _q: _q, size: size})
+      setReviews(data?.data?.data)
+			setTotalItem(data?.data?.total)
+    } catch (error) {
+      console.log(error)
+    }
+	}
+
+
+	const formatDate = (date: Date, format: string) => {
+		return dayjs(date).format(format);
+	}
+
+
   const handleStatus = (id: any) => {
 		setShowModalDelete(true)
     setIdReviews(id)
 	}
 
-  const handleUpdate = (item: any) => {
-		setShowModalEdit(true)
-		setItemReviews(item)
-	}
+	useEffect(() => {
+		if (_q) {
+			getDataListReviews()
+		}
+	}, [page, size])
 
-  useEffect(() => {
-    getDataListReviews()
-  }, [])
+	useEffect(() => {
+		if (!_q) {
+			getDataListReviews()
+		}
+	}, [_q, page, size])
 
   return (
     <>
-    	<ModalAddReviews
-				showModalAdd={showModalAdd}
-				setShowModalAdd={setShowModalAdd}
-				callBack={() => {
-					getDataListReviews()
-				}}
-			/>
-      <ModalEditReviews
-				showModalEdit={showModalEdit}
-				setShowModalEdit={setShowModalEdit}
-				itemReviews={itemReviews}
-				callBack={() => {
-					getDataListReviews()
-				}}
-			/>
       <Modal
-				title="Xóa user"
+				title="Xóa comment"
 				open={showModalDelete}
 				handleCancel={() => setShowModalDelete(false)}
 				handleConfirm={handleConfirmDelete}
 			>
-				Bạn chắc chắn muốn Xóa reviews này chứ?
+				Bạn chắc chắn muốn Xóa comment này chứ?
 			</Modal>
       <div className="wrapper">
         <div className="wrapper-box">
           <div className="content">
             <div className="intro-y flex items-center mt-8">
-              <h2 className="text-lg font-medium mr-auto">Danh sách Reviews</h2>
+              <h2 className="text-lg font-medium mr-auto">Danh sách Tours</h2>
             </div>
             <div className="grid grid-cols-24 gap-6 mt-5 overflow-y-auto">
               <div className="intro-y col-span-12 lg:col-span-6">
@@ -94,18 +103,12 @@ const Ticket = () => {
                 <div className="intro-y box">
                 <div className="flex flex-col sm:flex-row items-center p-5 border-b border-slate-200/60 justify-between">
 											<div className="flex items-center">
-												<div className="btn btn-primary mr-2 shadow-md w-full" onClick={() => setShowModalAdd(true)}>
-													<span className="flex h-4 w-8 items-center justify-center">
-														<Plus />
-													</span>
-													Thêm mới
-												</div>
 											</div>
 										<div className="flex items-center font-medium ">
 											<div className="flex items-center gap-5 flex-wrap justify-end">
 												<div className="w-60 relative text-slate-500">
 													<InputSearchDebounce
-                            onChange={() => null}
+                             onChange={(input: string) => setQueryParams({ ...params, page: page, size: size, _q: input?.trim() }, true)}
 														placeholder="Từ khóa"
 														className="form-control box pr-10 w-56 flex-end"
 														delay={400}
@@ -113,7 +116,7 @@ const Ticket = () => {
 												</div>
 
 												<div>
-													<button className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
+													<button onClick={searchReviews} className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
 														Tìm
 													</button>
 												</div>
@@ -128,11 +131,11 @@ const Ticket = () => {
                           <thead className="table-dark">
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
-                              <th className="whitespace-nowrap">Họ tên</th>
-                              <th className="whitespace-nowrap">Username</th>
-                              <th className="whitespace-nowrap">Role</th>
-                              <th className="whitespace-nowrap">Email</th>
-                              <th className="whitespace-nowrap">SĐT</th>
+                              <th className="whitespace-nowrap">Người commnet</th>
+                              <th className="whitespace-nowrap">Phim</th>
+                              <th className="whitespace-nowrap">Comment</th>
+                              <th className="whitespace-nowrap">Đánh giá</th>
+                              <th className="whitespace-nowrap">Thời gian comment</th>
                               <th className="whitespace-nowrap">Operation</th>
                             </tr>
                           </thead>
@@ -143,24 +146,22 @@ const Ticket = () => {
                                   <>
                                     <tr className="text-center">
                                       <td>{item.id}</td>
-                                      <td>{item.name}</td>
-                                      <td>{item.username}</td>
-                                      <td>{item.role}</td>
-                                      <td>{item.email}</td>
-                                      <td>{item.phoneNumber}</td>
+                                      <td>{item?.user?.name}</td>
+                                      <td>{item?.tours?.tourName}</td>
+                                      <td>{item?.comment}</td>
+                                      <td>{item?.rating}</td>
+                                      <td>{item?.createdAt && formatDate(item?.createdAt, "DD/MM/YYYY HH:mm:ss")}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
-                                        <div className="flex items-center justify-around">
-                                          <div className="cursor-pointer font-semibold text-sky-600 hover:opacity-60 flex items-center" onClick={() => handleUpdate(item)}>
+                                        <div className="flex items-center justify-betweeen">
+                                          <div className={ `font-semibold text-sky-600 hover:opacity-60 flex items-center ${user?.role === "ADMIN" ? "cursor-pointer " : "cursor-not-allowed"}`} >
                                             <div className='inline-block' />
                                             <Edit className='mr-1.5 inline-block' size={16} />
                                             <div>
-                                              <span>Sửa</span>
                                             </div>
                                           </div>
-                                          <div className="w-[50px] cursor-pointer font-semibold text-danger  hover:opacity-60 flex items-center ml-[20px]" onClick={() => handleStatus(item.id)}>
+                                          <div className={ `font-semibold text-sky-600 hover:opacity-60 flex items-center ${user?.role === "ADMIN" ? "cursor-pointer " : "cursor-not-allowed"}`} onClick={() => {if(user?.role === "ADMIN") handleStatus(item.id)}}>
                                             <div className="flex items-center justify-start text-danger">
-                                              <X className="mr-1.5" size={20} />
-                                              Xóa
+                                              <Trash2 className="mr-1.5" size={20} />
                                             </div>
                                           </div>
                                         </div>
@@ -182,16 +183,16 @@ const Ticket = () => {
         </div>
       </div>
       <div className="flex justify-between w-full mt-10">
-        <Pagination
-          pageNumber={1}
-          pageSize={1}
-          totalRow={1}
-          onPageChange={() => null}
-          onChangePageSize={() => null}
-        />
+			<Pagination
+									pageNumber={page}
+									pageSize={size}
+									totalRow={totalItem}
+									onPageChange={(page) => setQueryParams({ page })}
+									onChangePageSize={(size) => setQueryParams({ size })}
+								/>
       </div>
     </>
   )
 }
 
-export default Ticket
+export default Reviews

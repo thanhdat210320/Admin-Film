@@ -20,7 +20,7 @@ const reviewsAPI = {
 	deleteReviews(
     id: string
   ): Promise<CommonResponse> {
-    const url = `/v1/reviews/delete/${id}`
+    const url = `/v1/reviews/${id}`
     return deleteAsync(url)
   }
 };

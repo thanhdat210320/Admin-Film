@@ -128,11 +128,10 @@ const Screenings = () => {
                           <thead className="table-dark">
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
-                              <th className="whitespace-nowrap">Họ tên</th>
-                              <th className="whitespace-nowrap">Username</th>
-                              <th className="whitespace-nowrap">Role</th>
-                              <th className="whitespace-nowrap">Email</th>
-                              <th className="whitespace-nowrap">SĐT</th>
+                              <th className="whitespace-nowrap">Tên phim</th>
+                              <th className="whitespace-nowrap">Tên rạp phim</th>
+                              <th className="whitespace-nowrap">Thời gian bắt đầu</th>
+                              <th className="whitespace-nowrap">Thời gian kết thúc</th>
                               <th className="whitespace-nowrap">Chức năng</th>
                             </tr>
                           </thead>
@@ -146,7 +145,6 @@ const Screenings = () => {
                                       <td>{item.name}</td>
                                       <td>{item.username}</td>
                                       <td>{item.role}</td>
-                                      <td>{item.email}</td>
                                       <td>{item.phoneNumber}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
                                         <div className="flex items-center justify-around">

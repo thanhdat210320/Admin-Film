@@ -154,7 +154,7 @@ const Cinemas = () => {
                           <thead className="table-dark">
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
-                              <th className="whitespace-nowrap">Tên</th>
+                              <th className="whitespace-nowrap">Tên rạp phim</th>
 															<th className="whitespace-nowrap">Địa chỉ</th>
 															<th className="whitespace-nowrap">Thành phố</th>
                               <th className="whitespace-nowrap">Chức năng</th>

@@ -127,11 +127,9 @@ const Ticket = () => {
                           <thead className="table-dark">
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
-                              <th className="whitespace-nowrap">Họ tên</th>
-                              <th className="whitespace-nowrap">Username</th>
-                              <th className="whitespace-nowrap">Role</th>
-                              <th className="whitespace-nowrap">Email</th>
-                              <th className="whitespace-nowrap">SĐT</th>
+                              <th className="whitespace-nowrap">Tên phòng chiếu</th>
+                              <th className="whitespace-nowrap">Số ghế</th>
+                              <th className="whitespace-nowrap">Giá tiền</th>
                               <th className="whitespace-nowrap">Chức năng</th>
                             </tr>
                           </thead>
