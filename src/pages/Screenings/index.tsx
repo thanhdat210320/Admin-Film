@@ -10,6 +10,9 @@ import ticketAPI from '@/services/tickets.service'
 import ModalEditScreenings from '@/components/ModalEditScreenings'
 import ModalAddScreenings from '@/components/ModalAddScreenings'
 import screeningsAPI from '@/services/screenings.service'
+import moviesAPI from '@/services/movies.service'
+import cinemasAPI from '@/services/cinemas.service'
+import useQueryParams from '@/hooks/useQueryParams'
 
 const Screenings = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
@@ -18,19 +21,50 @@ const Screenings = () => {
   const [itemScreenings, setItemScreenings] = useState<any>({});
   const [idScreenings, setIdScreenings] = useState<any>();
   const [screenings, setScreenings] = useState<any>([]);
+  const [totalItem, setTotalItem] = useState<number>(0);
+  const [params, setQueryParams] = useQueryParams()
+	const { page, size, _q} = params
 
   const getDataListScreenings = async () => {
-    try {
-      const data = await screeningsAPI.getScreenings()
-      setScreenings(data?.data?.data)
+		try {
+      const [data, datas,  cinemas ] = await Promise.all([
+        screeningsAPI.getScreenings({ page: page, _q: _q, size: size}),
+				moviesAPI.getMovies({ page: 1, _q: _q, size: 999}),
+				cinemasAPI.getCinemas({ page: 1, size: 999})
+			])
+
+			const newData: any = data?.data?.data?.map((item: any) => {
+				return {
+					...item,
+					cinemasName: cinemas?.data?.data?.find((itemCate: any) => itemCate?.id === item?.cinemaId)?.name,
+          movieName: datas?.data?.data?.find((itemCate: any) => itemCate?.id === item?.movieId)?.title,
+				}
+			})
+
+      setScreenings(newData)
+      setTotalItem(data?.data?.total)
     } catch (error) {
       console.log(error)
     }
   }
 
+  const search = async () => {
+		setQueryParams({
+			...params, page: 1, size: size
+		}, true)
+		try {
+      const data = await screeningsAPI.getScreenings({ page: page, _q: _q, size: size})
+
+      setScreenings(data?.data?.data)
+			setTotalItem(data?.data?.total)
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
   const handleConfirmDelete = async () => {
     try {
-			const res = await ticketAPI.deleteTicket(idScreenings)
+			const res = await screeningsAPI.deleteScreenings(idScreenings)
 			setShowModalDelete(false)
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
@@ -54,8 +88,16 @@ const Screenings = () => {
 	}
 
   useEffect(() => {
-    getDataListScreenings()
-  }, [])
+		if(_q){
+      getDataListScreenings()
+		}
+ }, [page, size])
+
+  useEffect(() => {
+		 if(!_q){
+      getDataListScreenings()
+		 }
+  }, [page, size, _q])
 
   return (
     <>
@@ -104,8 +146,8 @@ const Screenings = () => {
 										<div className="flex items-center font-medium ">
 											<div className="flex items-center gap-5 flex-wrap justify-end">
 												<div className="w-60 relative text-slate-500">
-													<InputSearchDebounce
-                            onChange={() => null}
+                        <InputSearchDebounce
+                            onChange={(input: string) => setQueryParams({ ...params, page: page, size: size, _q: input?.trim() }, true)}
 														placeholder="Từ khóa"
 														className="form-control box pr-10 w-56 flex-end"
 														delay={400}
@@ -113,7 +155,7 @@ const Screenings = () => {
 												</div>
 
 												<div>
-													<button className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
+													<button onClick={search} className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
 														Tìm
 													</button>
 												</div>
@@ -144,8 +186,8 @@ const Screenings = () => {
                                     <tr className="text-center">
                                       <td>{item.id}</td>
 																			<td>{item.name}</td>
-                                      <td>{item.movieId}</td>
-                                      <td>{item.cinemaId}</td>
+                                      <td>{item.movieName}</td>
+                                      <td>{item.cinemasName}</td>
                                       <td>{item.startTime}</td>
                                       <td>{item.endTime}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
@@ -182,13 +224,13 @@ const Screenings = () => {
         </div>
       </div>
       <div className="flex justify-between w-full mt-10">
-        <Pagination
-          pageNumber={1}
-          pageSize={1}
-          totalRow={1}
-          onPageChange={() => null}
-          onChangePageSize={() => null}
-        />
+			<Pagination
+									pageNumber={page}
+									pageSize={size}
+									totalRow={totalItem}
+									onPageChange={(page) => setQueryParams({ page })}
+									onChangePageSize={(limit) => setQueryParams({ limit })}
+								/>
       </div>
     </>
   )

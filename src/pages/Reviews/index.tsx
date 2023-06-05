@@ -147,9 +147,9 @@ const Reviews = () => {
                                     <tr className="text-center">
                                       <td>{item.id}</td>
                                       <td>{item?.user?.name}</td>
-                                      <td>{item?.tours?.tourName}</td>
-                                      <td>{item?.comment}</td>
-                                      <td>{item?.rating}</td>
+                                      <td>{item?.movies?.title}</td>
+                                      <td>{item?.message}</td>
+                                      <td>{item?.star}</td>
                                       <td>{item?.createdAt && formatDate(item?.createdAt, "DD/MM/YYYY HH:mm:ss")}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
                                         <div className="flex items-center justify-betweeen">

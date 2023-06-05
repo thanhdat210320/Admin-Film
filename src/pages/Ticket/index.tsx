@@ -9,6 +9,8 @@ import { toast } from 'react-toastify'
 import ticketAPI from '@/services/tickets.service'
 import ModalEditTicket from '@/components/ModalEditTicket'
 import ModalAddTicket from '@/components/ModalAddTicket'
+import screeningsAPI from '@/services/screenings.service'
+import useQueryParams from '@/hooks/useQueryParams'
 
 const Ticket = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
@@ -17,15 +19,54 @@ const Ticket = () => {
   const [itemTicket, setItemTicket] = useState<any>({});
   const [idTicket, setIdTicket] = useState<any>();
   const [tickets, setTickets] = useState<any>([]);
+  const [totalItem, setTotalItem] = useState<number>(0);
+  const [params, setQueryParams] = useQueryParams()
+	const { page, size, _q} = params
 
   const getDataListTickets = async () => {
     try {
-      const data = await ticketAPI.getTicket()
-      setTickets(data?.data?.data)
+      const [data, screenings ] = await Promise.all([
+        ticketAPI.getTicket({ page: page, _q: _q, size: size}),
+        screeningsAPI.getScreenings({ page: 1, size: 999}),
+
+      ])
+
+      const newData: any = data?.data?.data?.map((item: any) => {
+				return {
+					...item,
+					screeningsName: screenings?.data?.data?.find((itemCate: any) => itemCate?.id === item?.screeningId)?.name,
+				}
+			})
+      setTickets(newData)
+      setTotalItem(data?.data?.total)
     } catch (error) {
       console.log(error)
     }
   }
+
+  const search = async () => {
+		setQueryParams({
+			...params, page: 1, size: size
+		}, true)
+		try {
+      const [data, screenings ] = await Promise.all([
+        ticketAPI.getTicket({ page: page, _q: _q, size: size}),
+        screeningsAPI.getScreenings({ page: 1, size: 999}),
+
+      ])
+
+      const newData: any = data?.data?.data?.map((item: any) => {
+				return {
+					...item,
+					screeningsName: screenings?.data?.data?.find((itemCate: any) => itemCate?.id === item?.screeningId)?.name,
+				}
+			})
+      setTickets(newData)
+			setTotalItem(data?.data?.total)
+		} catch (error) {
+			console.log(error)
+		}
+	}
 
   const handleConfirmDelete = async () => {
     try {
@@ -53,8 +94,16 @@ const Ticket = () => {
 	}
 
   useEffect(() => {
-    getDataListTickets()
-  }, [])
+		if(_q){
+      getDataListTickets()
+		}
+ }, [page, size])
+
+  useEffect(() => {
+		 if(!_q){
+      getDataListTickets()
+		 }
+  }, [page, size, _q])
 
   return (
     <>
@@ -103,8 +152,8 @@ const Ticket = () => {
 										<div className="flex items-center font-medium ">
 											<div className="flex items-center gap-5 flex-wrap justify-end">
 												<div className="w-60 relative text-slate-500">
-													<InputSearchDebounce
-                            onChange={() => null}
+                        <InputSearchDebounce
+                            onChange={(input: string) => setQueryParams({ ...params, page: page, size: size, _q: input?.trim() }, true)}
 														placeholder="Từ khóa"
 														className="form-control box pr-10 w-56 flex-end"
 														delay={400}
@@ -112,7 +161,7 @@ const Ticket = () => {
 												</div>
 
 												<div>
-													<button className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
+													<button onClick={search} className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
 														Tìm
 													</button>
 												</div>
@@ -140,7 +189,7 @@ const Ticket = () => {
                                   <>
                                     <tr className="text-center">
                                       <td>{item.id}</td>
-                                      <td>{item.screeningId}</td>
+                                      <td>{item.screeningsName}</td>
                                       <td>{item.seatNumber}</td>
                                       <td>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item?.price)}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
@@ -177,13 +226,13 @@ const Ticket = () => {
         </div>
       </div>
       <div className="flex justify-between w-full mt-10">
-        <Pagination
-          pageNumber={1}
-          pageSize={1}
-          totalRow={1}
-          onPageChange={() => null}
-          onChangePageSize={() => null}
-        />
+			<Pagination
+									pageNumber={page}
+									pageSize={size}
+									totalRow={totalItem}
+									onPageChange={(page) => setQueryParams({ page })}
+									onChangePageSize={(limit) => setQueryParams({ limit })}
+								/>
       </div>
     </>
   )

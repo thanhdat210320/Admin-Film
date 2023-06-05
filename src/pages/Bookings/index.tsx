@@ -52,7 +52,7 @@ const Bookings = () => {
     try {
       const data = await bookingAPI.getBookings({ page: page, _q: _q, size: size, status})
       setBookings(data?.data?.data)
-			setTotalItem(data?.data?.total)
+	  setTotalItem(data?.data?.total)
     } catch (error) {
       console.log(error)
     }

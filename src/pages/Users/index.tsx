@@ -10,6 +10,7 @@ import ModalAddUser from '@/components/ModalAddUser'
 import Modal from '@/components/Modal'
 import { toast } from 'react-toastify'
 import ModalEditUser from '@/components/ModalEditUser'
+import useQueryParams from '@/hooks/useQueryParams'
 
 const Users = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
@@ -18,15 +19,32 @@ const Users = () => {
   const [itemUser, setItemUser] = useState<any>({});
   const [idUser, setIdUser] = useState<any>();
   const [users, setUsers] = useState<any>([]);
+  const [totalItem, setTotalItem] = useState<number>(0);
+  const [params, setQueryParams] = useQueryParams()
+	const { page, size, _q} = params
 
   const getDataListUsers = async () => {
     try {
-      const data = await userAPI.getUsers()
+      const data = await userAPI.getUsers({ page: page, _q: _q, size: size})
       setUsers(data?.data?.data)
+      setTotalItem(data?.data?.total)
     } catch (error) {
       console.log(error)
     }
   }
+
+  const search = async () => {
+		setQueryParams({
+			...params, page: 1, size: size
+		}, true)
+		try {
+      const data = await userAPI.getUsers({ page: page, _q: _q, size: size})
+      setUsers(data?.data?.data)
+      setTotalItem(data?.data?.total)
+		} catch (error) {
+			console.log(error)
+		}
+	}
 
   const handleConfirmDelete = async () => {
     try {
@@ -54,8 +72,17 @@ const Users = () => {
 	}
 
   useEffect(() => {
-    getDataListUsers()
-  }, [])
+		if(_q){
+      getDataListUsers()
+		}
+ }, [page, size])
+
+  useEffect(() => {
+		 if(!_q){
+      getDataListUsers()
+		 }
+  }, [page, size, _q])
+
 
   return (
     <>
@@ -104,8 +131,8 @@ const Users = () => {
 										<div className="flex items-center font-medium ">
 											<div className="flex items-center gap-5 flex-wrap justify-end">
 												<div className="w-60 relative text-slate-500">
-													<InputSearchDebounce
-                            onChange={() => null}
+                        <InputSearchDebounce
+                            onChange={(input: string) => setQueryParams({ ...params, page: page, size: size, _q: input?.trim() }, true)}
 														placeholder="Từ khóa"
 														className="form-control box pr-10 w-56 flex-end"
 														delay={400}
@@ -113,7 +140,7 @@ const Users = () => {
 												</div>
 
 												<div>
-													<button className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
+													<button onClick={search} className="btn btn-primary shadow-md px-[13px] mr-2 whitespace-nowrap">
 														Tìm
 													</button>
 												</div>
