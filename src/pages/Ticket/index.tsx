@@ -140,11 +140,9 @@ const Ticket = () => {
                                   <>
                                     <tr className="text-center">
                                       <td>{item.id}</td>
-                                      <td>{item.name}</td>
-                                      <td>{item.username}</td>
-                                      <td>{item.role}</td>
-                                      <td>{item.email}</td>
-                                      <td>{item.phoneNumber}</td>
+                                      <td>{item.screeningId}</td>
+                                      <td>{item.seatNumber}</td>
+                                      <td>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item?.price)}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
                                         <div className="flex items-center justify-around">
                                           <div className="cursor-pointer font-semibold text-sky-600 hover:opacity-60 flex items-center" onClick={() => handleUpdate(item)}>

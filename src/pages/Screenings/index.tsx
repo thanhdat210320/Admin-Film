@@ -128,6 +128,7 @@ const Screenings = () => {
                           <thead className="table-dark">
                             <tr className="text-center">
                               <th className="whitespace-nowrap">ID</th>
+															<th className="whitespace-nowrap">Tên phòng chiếu</th>
                               <th className="whitespace-nowrap">Tên phim</th>
                               <th className="whitespace-nowrap">Tên rạp phim</th>
                               <th className="whitespace-nowrap">Thời gian bắt đầu</th>
@@ -142,10 +143,11 @@ const Screenings = () => {
                                   <>
                                     <tr className="text-center">
                                       <td>{item.id}</td>
-                                      <td>{item.name}</td>
-                                      <td>{item.username}</td>
-                                      <td>{item.role}</td>
-                                      <td>{item.phoneNumber}</td>
+																			<td>{item.name}</td>
+                                      <td>{item.movieId}</td>
+                                      <td>{item.cinemaId}</td>
+                                      <td>{item.startTime}</td>
+                                      <td>{item.endTime}</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
                                         <div className="flex items-center justify-around">
                                           <div className="cursor-pointer font-semibold text-sky-600 hover:opacity-60 flex items-center" onClick={() => handleUpdate(item)}>

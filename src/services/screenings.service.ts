@@ -1,5 +1,5 @@
 import { CommonResponse } from "models/common";
-import { getAsync, patchAsync, deleteAsync, postAsync } from "./request";
+import { getAsync, patchAsync, deleteAsync, postAsync, putAsync } from "./request";
 
 const screeningsAPI = {
 	getScreenings(params?: any): Promise<CommonResponse> {
@@ -15,7 +15,7 @@ const screeningsAPI = {
     params: any
   ): Promise<CommonResponse> {
     const url = `/v1/screenings/${id}`
-    return patchAsync(url, params)
+    return putAsync(url, params)
   },
 	deleteScreenings(
     id: string

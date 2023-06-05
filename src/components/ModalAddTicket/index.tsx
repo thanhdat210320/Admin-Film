@@ -1,23 +1,18 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import Modal from 'components/Modal'
 import userAPI from "@/services/users.service";
+import ticketAPI from "@/services/tickets.service";
+import ReactSelect from 'react-select';
+import useQueryParams from "@/hooks/useQueryParams";
+import screeningsAPI from "@/services/screenings.service";
 
 const schema = yup.object().shape({
-	fullname: yup.string().required("Vui lòng nhập họ tên").max(30, "Họ tên tối đa 30 ký tự!"),
-	username: yup.string().required("Vui lòng nhập Username"),
-	password: yup.string().required("Vui lòng nhập Password").max(40, "Mật khẩu tối đa 40 ký tự!")
-		.min(6, "Mật khẩu tối thiểu 6 ký tự!").matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,40})/,
-			"Mật khẩu phải có từ 6 đến 32 ký tự, có ký tự chữ số, chữ hoa và chữ thường."),
-	email: yup.string().required("Vui lòng nhập Email").max(40, "Email tối đa 40 ký tự!")
-		.email("Email không đúng định dạng"),
-	phone: yup.string().required("Vui lòng nhập SĐT").max(15, "SDT tối đa 15 ký tự!")
-		.matches(/^(84|0[3|5|7|8|9])[0-9]{8,13}$/, {
-			message: "Số điện thoại chưa đúng định dạng", excludeEmptyString: true
-		})
+	seatNumber: yup.string().required("Vui lòng nhập seatNumber"),
+	price: yup.string().required("Vui lòng nhập price"),
 })
 
 type IProps = {
@@ -27,6 +22,9 @@ type IProps = {
 }
 
 const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
+	const [params, setQueryParams] = useQueryParams()
+	const { page, size, cinemaId, screeningId } = params
+	const [screenings, setScreenings] = useState<any>([])
 
 	const {
 		register,
@@ -36,11 +34,8 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 	} = useForm({
 		resolver: yupResolver(schema),
 		defaultValues: {
-			fullname: '',
-			username: '',
-			email: '',
-			phone: '',
-			password: '',
+			seatNumber: '',
+			price: '',
 		}
 	})
 
@@ -48,12 +43,10 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 
 	const addUser = async (data: any) => {
 		try {
-			const res = await userAPI.addUser({
-				name: data?.fullname,
-				username: data?.username,
-				email: data?.email,
-				phoneNumber: data?.phone,
-				password: data?.password,
+			const res = await ticketAPI.addTicket({
+				screeningId: screeningId,
+				seatNumber: data.seatNumber,
+				price: data.price,
 			})
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
@@ -67,13 +60,24 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 		}
 	}
 
+
+	const getDataListScreenings = async () => {
+		try {
+		  const data = await screeningsAPI.getScreenings({size: 999})
+		  setScreenings(data?.data?.data)
+		} catch (error) {
+		  console.log(error)
+		}
+	  }
+
+		useEffect(() => {
+			getDataListScreenings()
+		},[])
+
 	useEffect(() => {
 		reset({
-			fullname: '',
-			username: '',
-			email: '',
-			phone: '',
-			password: '',
+			seatNumber: '',
+			price: '',
 		})
 	}, [ setShowModalAdd, showModalAdd])
 	return (
@@ -91,38 +95,57 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 						<span className="w-[140px] font-medium text-base">
 							Họ tên:
 						</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập họ và tên"
-								type="text"
-								{...register("fullname")}
-								className="form-control w-full"
+						<ReactSelect
+								options={screenings?.map((subject: any) => {
+									return {
+										value: subject.id,
+										label: subject.name
+									};
+								}
+								)}
+								onChange={(value: any) => {
+									setQueryParams({
+										...params, page: page, size: size, screeningId: value ? value.value : undefined,
+										category: undefined,
+									}, true)
+								}}
+								value={
+									screenings?.filter((item: any) => item.id == screeningId).map((item: any) => {
+										return {
+											value: item.id,
+											label: item.name
+										}
+									})
+								}
+								className="w-60 flex-1"
+								isClearable
+								classNamePrefix="select-input__custom "
+								placeholder="Chọn môn"
 							/>
-						</div>
 					</div>
-					{errors?.fullname && (
+					{errors?.screeningId && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.fullname?.message}
+							{errors?.screeningId?.message}
 						</p>
 					)}
 				</div>
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Username:
+						seatNumber:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập Username"
+								placeholder="Nhập seatNumber"
 								type="text"
-								{...register("username")}
+								{...register("seatNumber")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.username && (
+					{errors?.seatNumber && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.username?.message}
+							{errors?.seatNumber?.message}
 						</p>
 					)}
 				</div>
@@ -135,56 +158,17 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 							<input
 								placeholder="Nhập Email"
 								type="text"
-								{...register("email")}
+								{...register("price")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.email && (
+					{errors?.price && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.email?.message}
+							{errors?.price?.message}
 						</p>
 					)}
 				</div>
-				<div className="my-2">
-					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">SĐT:</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập số điện thoại"
-								type="text"
-								{...register("phone")}
-								className="form-control w-full"
-							/>
-						</div>
-					</div>
-					{errors?.phone && (
-						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.phone?.message}
-						</p>
-					)}
-				</div>
-
-				<div className="my-2">
-					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Mật khẩu:</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập mật khẩu"
-								type="text"
-								{...register("password")}
-								className="form-control w-full"
-							/>
-						</div>
-					</div>
-					{errors?.password && (
-						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.password?.message}
-						</p>
-					)}
-				</div>
-
-
 			</div>
 		</Modal>
 	)

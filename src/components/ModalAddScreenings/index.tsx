@@ -1,17 +1,20 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import Modal from 'components/Modal'
 import userAPI from "@/services/users.service";
 import moviesAPI from "@/services/movies.service";
+import cinemasAPI from "@/services/cinemas.service";
+import ReactSelect from 'react-select';
+import useQueryParams from "@/hooks/useQueryParams";
+import screeningsAPI from "@/services/screenings.service";
 
 const schema = yup.object().shape({
-	title: yup.string().required("Vui lòng nhập title"),
-	genre: yup.string().required("Vui lòng nhập genre"),
-	trailer:yup.string().required("Vui lòng nhập trailer"),
-	duration: yup.string().required("Vui lòng nhập duration")
+	name: yup.string().required("Vui lòng nhập name"),
+	startTime:yup.string().required("Vui lòng nhập trailer"),
+	endTime: yup.string().required("Vui lòng nhập duration")
 })
 
 type IProps = {
@@ -21,6 +24,10 @@ type IProps = {
 }
 
 const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => {
+  const [movies, setMovies] = useState<any>([]);
+  const [categories, setCategories] = useState<any>([])
+	const [params, setQueryParams] = useQueryParams()
+	const { page, size, cinemaId, movieId } = params
 
 	const {
 		register,
@@ -30,23 +37,22 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 	} = useForm({
 		resolver: yupResolver(schema),
 		defaultValues: {
-			title: '',
-			genre: '',
-			trailer: '',
-			duration: ''
+			name: '',
+			startTime: '',
+			endTime: ''
 		}
 	})
 
 	const { errors, isDirty }: any = formState;
 
-	const addUser = async (data: any) => {
+	const addScreen = async (data: any) => {
 		try {
-			const res = await moviesAPI.addMovies({
-				title: data?.title,
-				genre: data?.genre,
-				trailer: data?.trailer,
-				duration: data?.duration,
-				director: 'ok'
+			const res = await screeningsAPI.addScreenings({
+				name: data.name,
+				movieId: movieId,
+				cinemaId: cinemaId,
+				startTime: data.startTime,
+				endTime: data.endTime,
 			})
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
@@ -60,12 +66,39 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 		}
 	}
 
+	const getDataListCinemas = async () => {
+		try {
+		  const data = await cinemasAPI.getCinemas({size: 999})
+		  setCategories(data?.data?.data)
+		} catch (error) {
+		  console.log(error)
+		}
+	  }
+
+		const getDataListMovies = async () => {
+			try {
+				const data = await moviesAPI.getMovies({cinemaId, page, size})
+				setMovies(data?.data?.data)
+			} catch (error) {
+				console.log(error)
+			}
+			}
+
+		useEffect(() => {
+			if(cinemaId) {
+			getDataListMovies()
+			}
+		},[cinemaId])
+
+	  useEffect(() => {
+			getDataListCinemas()
+	},[])
+
 	useEffect(() => {
 		reset({
-			title: '',
-			genre: '',
-			trailer: '',
-			duration: ''
+			name: '',
+			startTime: '',
+			endTime: ''
 		})
 	}, [ setShowModalAdd, showModalAdd])
 	return (
@@ -73,7 +106,7 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 			title="Thêm thông tin phim"
 			open={showModalAdd}
 			handleCancel={() => setShowModalAdd(false)}
-			handleConfirm={handleSubmit(addUser)}
+			handleConfirm={handleSubmit(addScreen)}
 			className="w-full max-w-[475px]"
 			confirmButtonTitle="Lưu"
 		>
@@ -87,54 +120,90 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 							<input
 								placeholder="Nhập tên phim"
 								type="text"
-								{...register("title")}
+								{...register("name")}
 								className="form-control w-full"
 							/>
 						</div>
 					</div>
-					{errors?.title && (
+					{errors?.name && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.title?.message}
+							{errors?.name?.message}
 						</p>
 					)}
 				</div>
 				<div className="my-2">
-					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">
-							Thể loại:
-						</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập thể loại"
-								type="text"
-								{...register("genre")}
-								className="form-control w-full"
+					<div className="flex items-center ">
+							<label className="w-[140px] font-medium text-base">Loại tour: </label>
+							<ReactSelect
+								options={categories?.map((subject: any) => {
+									return {
+										value: subject.id,
+										label: subject.name
+									};
+								}
+								)}
+								onChange={(value: any) => {
+									setQueryParams({
+										...params, page: page, size: size, cinemaId: value ? value.value : undefined,
+										category: undefined,
+									}, true)
+								}}
+								value={
+									categories?.filter((item: any) => item.id == cinemaId).map((item: any) => {
+										return {
+											value: item.id,
+											label: item.name
+										}
+									})
+								}
+								className="w-60 flex-1"
+								isClearable
+								classNamePrefix="select-input__custom "
+								placeholder="Chọn môn"
 							/>
 						</div>
+						{errors?.cinemaId && (
+							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+								{errors?.cinemaId?.message}
+							</p>
+						)}
 					</div>
-					{errors?.genre && (
-						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.genre?.message}
-						</p>
-					)}
-				</div>
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
 							Trailer:
 						</span>
-						<div className="flex-1">
-							<input
-								placeholder="Nhập Trailer"
-								type="text"
-								{...register("trailer")}
-								className="form-control w-full"
+						<ReactSelect
+								options={movies?.map((subject: any) => {
+									return {
+										value: subject.id,
+										label: subject.title
+									};
+								}
+								)}
+								onChange={(value: any) => {
+									setQueryParams({
+										...params, page: page, size: size, movieId: value ? value.value : undefined,
+										category: undefined,
+									}, true)
+								}}
+								value={
+									movies?.filter((item: any) => item.id == movieId).map((item: any) => {
+										return {
+											value: item.id,
+											label: item.title
+										}
+									})
+								}
+								className="w-60 flex-1"
+								isClearable
+								classNamePrefix="select-input__custom "
+								placeholder="Chọn môn"
 							/>
-						</div>
 					</div>
-					{errors?.trailer && (
+					{errors?.movieId && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-							{errors?.trailer?.message}
+							{errors?.movieId?.message}
 						</p>
 					)}
 				</div>
@@ -144,8 +213,8 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 						<div className="flex-1">
 							<input
 								placeholder="Nhập Độ dài phim"
-								type="text"
-								{...register("duration")}
+								type="time"
+								{...register("startTime")}
 								className="form-control w-full"
 							/>
 						</div>
@@ -153,6 +222,25 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 					{errors?.duration && (
 						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
 							{errors?.duration?.message}
+						</p>
+					)}
+				</div>
+
+				<div className="my-2">
+					<div className="flex items-center">
+						<span className="w-[140px] font-medium text-base">Độ dài:</span>
+						<div className="flex-1">
+							<input
+								placeholder="Nhập Độ dài phim"
+								type="time"
+								{...register("endTime")}
+								className="form-control w-full"
+							/>
+						</div>
+					</div>
+					{errors?.endTime && (
+						<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
+							{errors?.endTime?.message}
 						</p>
 					)}
 				</div>
