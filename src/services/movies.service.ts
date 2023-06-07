@@ -22,7 +22,11 @@ const moviesAPI = {
   ): Promise<CommonResponse> {
     const url = `/v1/movies/delete/${id}`
     return deleteAsync(url)
-  }
+  },
+	getMoviesBooinges(params?: any): Promise<CommonResponse> {
+		const url = "/v1/movies/bookingest"
+		return getAsync(url, params);
+	},
 };
 
 export default moviesAPI;

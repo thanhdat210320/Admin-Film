@@ -222,10 +222,10 @@ const Bookings = () => {
 											<td>{item.user.name}</td>
 											{/* <td>{item?.createdAt && formatDate(item?.createdAt, "DD/MM/YYYY HH:mm:ss")}</td> */}
 											<td>{item?.bookingDate && formatDate(item?.bookingDate, "DD/MM/YYYY HH:mm:ss")}</td>
-											<td className={`${item?.status === "DADAT" ? "text-[#FFCC00]" : item.status === "DAXACNHAN" ? "text-[#0066FF]" : item.status === "DANGXEMPHIM" ? "text-[#FF1493]" : item.status === "HUYTOUR" ? "text-[#CC0000]" : item?.status === "DAHOANTHANHTOUR" && "text-[#00CC00]"}`}>{item?.status === "DADAT" ? "Chờ xử lí" : item.status === "DAXACNHAN" ? "Đã xác nhận" : item.status === "DANGDITOUR" ? "Đang đi tour" : item.status === "HUYTOUR" ? "Đã hủy" : item?.status === "DAHOANTHANHTOUR" && "Đã hoàn thành"}</td>
+											<td className={`${item?.status === "DADAT" ? "text-[#FFCC00]" : item.status === "DAXACNHAN" ? "text-[#0066FF]" : item.status === "DANGXEMPHIM" ? "text-[#FF1493]" : item.status === "HUYTOUR" ? "text-[#CC0000]" : item?.status === "DAHOANTHANH" && "text-[#00CC00]"}`}>{item?.status === "DADAT" ? "Chờ xử lí" : item.status === "DAXACNHAN" ? "Đã xác nhận" : item.status === "DANGXEMPHIM" ? "Đang xem phim" : item.status === "HUYTOUR" ? "Đã hủy" : item?.status === "DAHOANTHANH" && "Đã hoàn thành"}</td>
 											<td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
 												<div className="flex items-center justify-between">
-													<div className={`font-semibold text-sky-600 hover:opacity-60 flex items-center ${user?.role === "ADMIN" ? "cursor-pointer " : "cursor-not-allowed"}`} onClick={() => { if (user?.role === "ADMIN") handleView(item) }}>
+													<div className="font-semibold text-sky-600 hover:opacity-60 flex items-center cursor-pointer" onClick={() =>handleView(item)}>
 														<div className='inline-block' />
 														<Eye className='mr-1.5 inline-block' size={16} />
 														<div>

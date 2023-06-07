@@ -11,6 +11,7 @@ import ModalAddMovies from '@/components/ModalAddMovies'
 import moviesAPI from '@/services/movies.service'
 import useQueryParams from '@/hooks/useQueryParams'
 import cinemasAPI from '@/services/cinemas.service'
+import { useAuth } from '@/contexts/auth'
 
 const Movies = () => {
 	const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
@@ -22,6 +23,7 @@ const Movies = () => {
 	const [totalItem, setTotalItem] = useState<number>(0);
 	const [params, setQueryParams] = useQueryParams()
 	const { page, size, _q} = params
+	const { user } = useAuth()
 
   const getDataListMovies = async () => {
 		try {
@@ -132,12 +134,14 @@ const Movies = () => {
                 <div className="intro-y box">
                 <div className="flex flex-col sm:flex-row items-center p-5 border-b border-slate-200/60 justify-between">
 											<div className="flex items-center">
+											{user?.role === "ADMIN" && (
 												<div className="btn btn-primary mr-2 shadow-md w-full" onClick={() => setShowModalAdd(true)}>
 													<span className="flex h-4 w-8 items-center justify-center">
 														<Plus />
 													</span>
 													Thêm mới
 												</div>
+											)}
 											</div>
 										<div className="flex items-center font-medium ">
 											<div className="flex items-center gap-5 flex-wrap justify-end">
@@ -173,6 +177,7 @@ const Movies = () => {
 															<th className="whitespace-nowrap">Nội dung</th>
 															<th className="whitespace-nowrap">Trailer</th>
                               <th className="whitespace-nowrap">Thể loại</th>
+															<th className="whitespace-nowrap">Diễn viên</th>
                               <th className="whitespace-nowrap">Độ dài</th>
                               <th className="whitespace-nowrap">Chức năng</th>
                             </tr>
@@ -191,20 +196,19 @@ const Movies = () => {
 																			<td><p className='w-[200px] truncate' title={item.descristion}>{item.descristion}</p></td>
 																			<td>{item.trailer}</td>
                                       <td>{item.genre}</td>
+																			<td>{item.director}</td>
                                       <td>{item.duration}p</td>
                                       <td className="table-report__action w-[1%] border-l whitespace-nowrap lg:whitespace-normal">
                                         <div className="flex items-center justify-around">
-                                          <div className="cursor-pointer font-semibold text-sky-600 hover:opacity-60 flex items-center" onClick={() => handleUpdate(item)}>
+                                          <div className={`font-semibold text-sky-600 hover:opacity-60 flex items-center ${user?.role === "ADMIN" ? "cursor-pointer " : "cursor-not-allowed"}`} onClick={() =>{ if (user?.role === "ADMIN")   handleUpdate(item)}}>
                                             <div className='inline-block' />
                                             <Edit className='mr-1.5 inline-block' size={16} />
                                             <div>
-                                              <span>Sửa</span>
                                             </div>
                                           </div>
-                                          <div className="w-[50px] cursor-pointer font-semibold text-danger  hover:opacity-60 flex items-center ml-[20px]" onClick={() => handleStatus(item.id)}>
+                                          <div className={`font-semibold text-sky-600 hover:opacity-60 flex items-center ${user?.role === "ADMIN" ? "cursor-pointer " : "cursor-not-allowed"}`} onClick={() =>{ if (user?.role === "ADMIN")   handleStatus(item.id)}}>
                                             <div className="flex items-center justify-start text-danger">
                                               <X className="mr-1.5" size={20} />
-                                              Xóa
                                             </div>
                                           </div>
                                         </div>

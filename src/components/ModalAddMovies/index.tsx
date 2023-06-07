@@ -17,7 +17,7 @@ const schema = yup.object().shape({
 	duration: yup.number().typeError("Trường này bắt buộc nhập số").required("Trường này bắt buộc nhập"),
 	director: yup.string().required("Vui lòng nhập startDate"),
 	cinemaId: yup.string().required("Vui lòng nhập cateId"),
-	genre: yup.number().typeError("Trường này bắt buộc nhập số").required("Trường này bắt buộc nhập"),
+	genre: yup.number().typeError("Trường này bắt buộc nhập số"),
 	trailer: yup.string().required("Vui lòng nhập transport")
 })
 
@@ -132,7 +132,7 @@ const ModalAddMovies = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Tên tour:
+							Tên phim:
 						</span>
 						<div className="flex-1">
 							<input
@@ -170,7 +170,7 @@ const ModalAddMovies = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				</div>
 				<div className="my-2">
 					<div className="flex items-center ">
-							<label className="w-[140px] font-medium text-base">Loại tour: </label>
+							<label className="w-[140px] font-medium text-base">Rạp chiếu: </label>
 							<div className="flex-1">
 							<select {...register("cinemaId")} id="crud-form-1" className="form-control w-full">
 							<option value="" className="hidden" selected >Nhập rạp chiếu</option>
@@ -223,7 +223,7 @@ const ModalAddMovies = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-						 Giá tiền:
+						 Trailer:
 						</span>
 						<div className="flex-1">
 							<input
@@ -243,11 +243,11 @@ const ModalAddMovies = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-						 Giá tiền:
+						 Thể loại:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập giá tiền"
+								placeholder="Nhập thể loại"
 								type="text"
 								{...register("genre")}
 								className="form-control w-full"
@@ -264,11 +264,11 @@ const ModalAddMovies = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-						 Giá tiền:
+						 Diễn viên:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập giá tiền"
+								placeholder="Nhập diễn viên"
 								type="text"
 								{...register("director")}
 								className="form-control w-full"
@@ -284,11 +284,11 @@ const ModalAddMovies = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-						 Giá tiền:
+						 Thời lượng:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập giá tiền"
+								placeholder="Nhập thời lượng"
 								type="text"
 								{...register("duration")}
 								className="form-control w-full"

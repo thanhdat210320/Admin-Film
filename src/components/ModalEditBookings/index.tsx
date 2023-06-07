@@ -4,7 +4,10 @@ import * as yup from "yup";
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import Modal from 'components/Modal'
-import moviesAPI from "@/services/movies.service";
+import userAPI from "@/services/users.service";
+import { useAuth } from "@/contexts/auth";
+import bookingAPI from "@/services/bookings.service";
+import dayjs from "dayjs";
 
 type IProps = {
 	itemBookings: Object | any
@@ -14,13 +17,43 @@ type IProps = {
 }
 
 const schema = yup.object().shape({
-	title: yup.string().required("Vui lòng nhập title"),
-	genre: yup.string().required("Vui lòng nhập genre"),
-	trailer:yup.string().required("Vui lòng nhập trailer"),
-	duration: yup.string().required("Vui lòng nhập duration")
+	userId: yup.string().required("Trường này bắt buộc nhập"),
+	movieId: yup.string().required("Trường này bắt buộc nhập"),
+	bookingDate: yup.string().required("Trường này bắt buộc nhập"),
+	status: yup.string().required("Trường này bắt buộc nhập"),
 })
 
+
+const actionsStatus = [
+	{
+		value: "DADAT",
+		label: "Chờ xử lí"
+	},
+	{
+		value: "DAXACNHAN",
+		label: "Xác nhận"
+	},
+	{
+		value: "DANGXEMPHIM",
+		label: "Đang xem phim"
+	},
+	{
+		value: "HUYTOUR",
+		label: "Đã hủy"
+	},
+	{
+		value: "DAHOANTHANH",
+		label: "Đã hoàn thành"
+	}
+]
+
 const ModalEditBookings = ({ showModalEdit, setShowModalEdit, itemBookings, callBack }: IProps) => {
+
+	console.log(itemBookings)
+
+	const formatDate = (date: Date, format: string) => {
+		return dayjs(date).format(format);
+	}
 
 	const {
 		register,
@@ -30,29 +63,31 @@ const ModalEditBookings = ({ showModalEdit, setShowModalEdit, itemBookings, call
 	} = useForm({
 		resolver: yupResolver(schema),
 		defaultValues: {
-			title: itemBookings?.title,
-			genre: itemBookings?.genre,
-			trailer: itemBookings?.trailer,
-			duration: itemBookings?.duration,
+			userId: itemBookings?.movies?.title,
+			movieId: itemBookings?.user?.name,
+			bookingDate: formatDate(itemBookings?.createdAt, "DD/MM/YYYY HH:mm:ss"),
+			status: itemBookings?.status,
 		}
 	})
+
+	console.log(itemBookings)
 
 	const { errors, isDirty }: any = formState;
 
 	const updatePost = async (data: any) => {
 		try {
-			const res = await moviesAPI.updateMovies(itemBookings?.id, {
-				title: data?.title,
-				genre: data?.genre,
-				trailer: data?.trailer,
-				duration: data?.duration,
+			const res = await bookingAPI.updateBookings(itemBookings?.id, {
+				userId: itemBookings?.userId,
+				movieId: itemBookings?.movieId,
+				bookingDate: itemBookings?.bookingDate,
+				status: data?.status,
 			})
 			setShowModalEdit(false)
 			if (res?.data?.status === 'error') {
 				toast.error(res?.data?.message)
 			} else {
 				callBack && callBack()
-				toast.success('Lưu thông tin thành công.')
+				toast.success('Cập nhật thông tin thành công.')
 			}
 		} catch (error) {
 			console.log(error)
@@ -61,16 +96,16 @@ const ModalEditBookings = ({ showModalEdit, setShowModalEdit, itemBookings, call
 
 	useEffect(() => {
 		reset({
-			title: itemBookings?.title,
-			genre: itemBookings?.genre,
-			trailer: itemBookings?.trailer,
-			duration: itemBookings?.duration,
+			userId: itemBookings?.movies?.title,
+			movieId: itemBookings?.user?.name,
+			bookingDate: formatDate(itemBookings?.createdAt, "DD/MM/YYYY HH:mm:ss"),
+			status: itemBookings?.status,
 		})
 	}, [itemBookings, setShowModalEdit, showModalEdit])
 	return (
 		<>
 			<Modal
-				title="Sửa thông tin phim"
+				title="Sửa trạng thái bookings"
 				open={showModalEdit}
 				handleCancel={() => setShowModalEdit(false)}
 				handleConfirm={handleSubmit(updatePost)}
@@ -81,78 +116,80 @@ const ModalEditBookings = ({ showModalEdit, setShowModalEdit, itemBookings, call
 					<div className="my-2">
 						<div className="flex items-center">
 							<span className="w-[140px] font-medium text-base">
-								Tên phim:
+								Tên tour:
 							</span>
 							<div className="flex-1">
 								<input
-									placeholder="Nhập tên phim"
 									type="text"
-									{...register("title")}
+									{...register("userId")}
+									disabled={true}
 									className="form-control w-full"
 								/>
 							</div>
 						</div>
-						{errors?.title && (
+						{errors?.tourName && (
 							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-								{errors?.title?.message}
+								{errors?.tourName?.message}
 							</p>
 						)}
 					</div>
 					<div className="my-2">
 						<div className="flex items-center">
 							<span className="w-[140px] font-medium text-base">
-								Thể loại:
+							Tên người đặt:
 							</span>
 							<div className="flex-1">
 								<input
-									placeholder="Nhập Thể loại"
 									type="text"
-									{...register("genre")}
+									{...register("movieId")}
 									className="form-control w-full"
+									disabled={true}
 								/>
 							</div>
 						</div>
-						{errors?.genre && (
+						{errors?.username && (
 							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-								{errors?.genre?.message}
+								{errors?.username?.message}
 							</p>
 						)}
 					</div>
 					<div className="my-2">
 						<div className="flex items-center">
-							<span className="w-[140px] font-medium text-base">
-							Trailer:
-							</span>
+							<span className="w-[140px] font-medium text-base">Ngày khời hành:</span>
 							<div className="flex-1">
 								<input
-									placeholder="Nhập Trailer"
+									placeholder="Nhập số điện thoại"
 									type="text"
-									{...register("trailer")}
+									{...register("bookingDate")}
 									className="form-control w-full"
+									disabled={true}
 								/>
 							</div>
 						</div>
-						{errors?.trailer && (
+						{errors?.bookingDate && (
 							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-								{errors?.trailer?.message}
+								{errors?.bookingDate?.message}
 							</p>
 						)}
 					</div>
+
 					<div className="my-2">
 						<div className="flex items-center">
-							<span className="w-[140px] font-medium text-base">Độ dài:</span>
+							<span className="w-[140px] font-medium text-base">Trạng thái:</span>
 							<div className="flex-1">
-								<input
-									placeholder="Nhập Độ dài"
-									type="text"
-									{...register("duration")}
-									className="form-control w-full"
-								/>
+							<select {...register("status")} id="crud-form-1" className="form-control w-full" >
+									<option value={itemBookings?.status} className="hidden" selected >{itemBookings?.status === "DADAT" ? "Chờ xử lí" : itemBookings.status === "DAXACNHAN" ? "Đã xác nhận" : itemBookings.status === "DANGXEMPHIM" ? "Đang xem phim" : itemBookings.status === "HUYTOUR" ? "Đã hủy" : itemBookings?.status === "DAHOANTHANH" && "Đã hoàn thành" }</option>
+									{
+										actionsStatus?.map((cate: any) => (
+												<option key={cate?.value} value={cate?.value}>{cate?.label}</option>
+										))
+									}
+								</select>
 							</div>
 						</div>
-						{errors?.duration && (
+						{errors?.status && (
 							<p className="text-sm text-red-700 mt-1 ml-1 m-auto pl-[140px]">
-								{errors?.duration?.message}
+								{errors?.status?.message}
 							</p>
 						)}
 					</div>

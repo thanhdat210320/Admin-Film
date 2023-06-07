@@ -42,12 +42,12 @@ export default function Home() {
 			bookingAPI.getBookings(),
 			cinemasAPI.getCinemas(),
 			reviewAPI.getReviews(),
-			bookingAPI.getMoviesBooinges()
+			moviesAPI.getMoviesBooinges()
 		]);
 
-		let labels = booingges?.data?.data?.map((tourName: any) => {
-			if (tourName?.tourName?.length > 20) return tourName.tourName.substring(0, 20) + '...';
-      return tourName.tourName
+		let labels = booingges?.data?.data?.map((filmName: any) => {
+			if (filmName?.title?.length > 20) return filmName.title.substring(0, 20) + '...';
+      return filmName.title
     })
 
 		let datasets = [

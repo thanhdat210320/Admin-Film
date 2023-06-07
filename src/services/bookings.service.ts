@@ -15,7 +15,7 @@ const bookingsAPI = {
     params: any
   ): Promise<CommonResponse> {
     const url = `/bookings/${id}`
-    return putAsync(url, params)
+    return patchAsync(url, params)
   },
 	deleteBookings(
     id: string
