@@ -76,7 +76,7 @@ export default function Home() {
       },
       title: {
         display: true,
-        text: 'Top 10 tour được đặt nhiều nhất',
+        text: 'Top 10 phim được đặt nhiều nhất',
         font: {
           size: 20
         }
@@ -100,27 +100,27 @@ export default function Home() {
               <div className="intro-y col-span-12 lg:col-span-6">
                 <div className="grid grid-cols-12 gap-6 mt-5">
                   <div className="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-                    <Link to={'/tours'} >
+                    <Link to={'/movies'} >
                       <div className="report-box zoom-in">
                         <div className="box p-5">
                           <div className="flex">
                             <div className="side-menu__icon text-blue-500 font-bold"><Type /></div>
                           </div>
                           <div className="text-3xl font-medium leading-8 mt-6">{movies ? movies : 0}</div>
-                          <div className="text-base text-slate-500 mt-1">Tours</div>
+                          <div className="text-base text-slate-500 mt-1">Movies</div>
                         </div>
                       </div>
                     </Link>
                   </div>
                   <div className="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-                  <Link to={'/categories'} >
+                  <Link to={'/cinemas'} >
                     <div className="report-box zoom-in">
                       <div className="box p-5">
                         <div className="flex">
                           <div className="side-menu__icon text-green-500 font-bold"><BookOpen /></div>
                         </div>
                         <div className="text-3xl font-medium leading-8 mt-6">{cinemas ? cinemas : 0}</div>
-                        <div className="text-base text-slate-500 mt-1">Loại tour</div>
+                        <div className="text-base text-slate-500 mt-1">Rạp chiếu</div>
                       </div>
                     </div>
                     </Link>
@@ -133,7 +133,7 @@ export default function Home() {
                           <div className="side-menu__icon text-red-500 font-bold"><Bookmark /></div>
                         </div>
                         <div className="text-3xl font-medium leading-8 mt-6">{booking ? booking : 0}</div>
-                        <div className="text-base text-slate-500 mt-1">Booktour</div>
+                        <div className="text-base text-slate-500 mt-1">Bookings</div>
                       </div>
                     </div>
                     </Link>
@@ -159,7 +159,7 @@ export default function Home() {
                 <div className="col-span-2">
                   <div className="intro-y block sm:flex items-center h-10 my-7">
                     <h2 className="text-lg font-medium truncate mr-5">
-                      Biều đồ thống kê booking tour
+                      Biều đồ thống kê đặt phim
                     </h2>
                   </div>
                   <div className=" bg-white p-5">

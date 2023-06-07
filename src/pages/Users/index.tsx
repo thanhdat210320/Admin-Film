@@ -5,7 +5,7 @@ import Pagination from 'components/Pagination'
 import 'react-datepicker/dist/react-datepicker.css'
 import ReactSelect from 'react-select'
 import userAPI from '@/services/users.service'
-import { Edit, Plus, X } from 'lucide-react'
+import { Edit, Plus, Trash2, X } from 'lucide-react'
 import ModalAddUser from '@/components/ModalAddUser'
 import Modal from '@/components/Modal'
 import { toast } from 'react-toastify'
@@ -189,7 +189,7 @@ const Users = () => {
                                           </div>
                                           <div className={`font-semibold text-sky-600 hover:opacity-60 flex items-center ${user?.role === "ADMIN" ? "cursor-pointer " : "cursor-not-allowed"}`} onClick={() =>{ if (user?.role === "ADMIN")    handleStatus(item.id)}}>
                                             <div className="flex items-center justify-start text-danger">
-                                              <X className="mr-1.5" size={20} />
+                                              <Trash2 className="mr-1.5" size={20} />
                                             </div>
                                           </div>
                                         </div>
@@ -211,13 +211,13 @@ const Users = () => {
         </div>
       </div>
       <div className="flex justify-between w-full mt-10">
-        <Pagination
-          pageNumber={1}
-          pageSize={1}
-          totalRow={1}
-          onPageChange={() => null}
-          onChangePageSize={() => null}
-        />
+			<Pagination
+									pageNumber={page}
+									pageSize={size}
+									totalRow={totalItem}
+									onPageChange={(page) => setQueryParams({ page })}
+									onChangePageSize={(limit) => setQueryParams({ limit })}
+								/>
       </div>
     </>
   )

@@ -3,7 +3,7 @@ import InputSearchDebounce from 'components/Form/InputSearchDebounce'
 import Pagination from 'components/Pagination'
 import 'react-datepicker/dist/react-datepicker.css'
 import ReactSelect from 'react-select'
-import { Edit, Plus, X } from 'lucide-react'
+import { Edit, Plus, Trash2, X } from 'lucide-react'
 import Modal from '@/components/Modal'
 import { toast } from 'react-toastify'
 import ticketAPI from '@/services/tickets.service'
@@ -142,9 +142,9 @@ const Ticket = () => {
               <div className="intro-y col-span-12 lg:col-span-6">
                 {/* BEGIN: Basic Table */}
                 <div className="intro-y box">
-                <div className="flex flex-col sm:flex-row items-center p-5 border-b border-slate-200/60 justify-end">
+                <div className="flex flex-col sm:flex-row items-center p-5 border-b border-slate-200/60 justify-between">
 								{user?.role === "ADMIN" && (
-												<div className="btn btn-primary mr-2 shadow-md w-full" onClick={() => setShowModalAdd(true)}>
+												<div className="btn btn-primary mr-2 shadow-md " onClick={() => setShowModalAdd(true)}>
 													<span className="flex h-4 w-8 items-center justify-center">
 														<Plus />
 													</span>
@@ -204,7 +204,7 @@ const Ticket = () => {
                                           </div>
                                           <div className={`font-semibold text-sky-600 hover:opacity-60 flex items-center ${user?.role === "ADMIN" ? "cursor-pointer " : "cursor-not-allowed"}`} onClick={() =>{ if (user?.role === "ADMIN") handleStatus(item.id)}}>
                                             <div className="flex items-center justify-start text-danger">
-                                              <X className="mr-1.5" size={20} />
+                                              <Trash2 className="mr-1.5" size={20} />
                                             </div>
                                           </div>
                                         </div>
