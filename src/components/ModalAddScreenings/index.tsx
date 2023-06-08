@@ -114,11 +114,11 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-						Tên phim:
+						Tên phòng chiếu:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập tên phim"
+								placeholder="Nhập tên phòng chiếu"
 								type="text"
 								{...register("name")}
 								className="form-control w-full"
@@ -133,7 +133,7 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 				</div>
 				<div className="my-2">
 					<div className="flex items-center ">
-							<label className="w-[140px] font-medium text-base">Loại tour: </label>
+							<label className="w-[140px] font-medium text-base">Rạp chiếu: </label>
 							<ReactSelect
 								options={categories?.map((subject: any) => {
 									return {
@@ -159,7 +159,7 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 								className="w-60 flex-1"
 								isClearable
 								classNamePrefix="select-input__custom "
-								placeholder="Chọn môn"
+								placeholder="Chọn rạp chiếu"
 							/>
 						</div>
 						{errors?.cinemaId && (
@@ -171,7 +171,7 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Trailer:
+							Tên phim:
 						</span>
 						<ReactSelect
 								options={movies?.map((subject: any) => {
@@ -198,7 +198,7 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 								className="w-60 flex-1"
 								isClearable
 								classNamePrefix="select-input__custom "
-								placeholder="Chọn môn"
+								placeholder="Chọn phim"
 							/>
 					</div>
 					{errors?.movieId && (
@@ -209,7 +209,7 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 				</div>
 				<div className="my-2">
 					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Độ dài:</span>
+						<span className="w-[140px] font-medium text-base">Bắt đầu:</span>
 						<div className="flex-1">
 							<input
 								placeholder="Nhập Độ dài phim"
@@ -228,7 +228,7 @@ const ModalAddScreenings = ({ setShowModalAdd, showModalAdd, callBack }: IProps)
 
 				<div className="my-2">
 					<div className="flex items-center">
-						<span className="w-[140px] font-medium text-base">Độ dài:</span>
+						<span className="w-[140px] font-medium text-base">Kết thúc:</span>
 						<div className="flex-1">
 							<input
 								placeholder="Nhập Độ dài phim"

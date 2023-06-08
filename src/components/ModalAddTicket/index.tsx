@@ -52,7 +52,7 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				toast.error(res?.data?.message)
 			} else {
 				callBack && callBack()
-				toast.success('Thêm User thành công.')
+				toast.success('Thêm vé thành công.')
 				setShowModalAdd(false)
 			}
 		} catch (error) {
@@ -82,7 +82,7 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 	}, [ setShowModalAdd, showModalAdd])
 	return (
 		<Modal
-			title="Thêm thông tin User"
+			title="Thêm thông tin vé"
 			open={showModalAdd}
 			handleCancel={() => setShowModalAdd(false)}
 			handleConfirm={handleSubmit(addUser)}
@@ -93,7 +93,7 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Họ tên:
+							Tên phòng chiếu:
 						</span>
 						<ReactSelect
 								options={screenings?.map((subject: any) => {
@@ -120,7 +120,7 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 								className="w-60 flex-1"
 								isClearable
 								classNamePrefix="select-input__custom "
-								placeholder="Chọn môn"
+								placeholder="Chọn phòng chiếu"
 							/>
 					</div>
 					{errors?.screeningId && (
@@ -132,11 +132,11 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-						seatNumber:
+						Số ghế ngồi:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập seatNumber"
+								placeholder="Nhập số ghế"
 								type="text"
 								{...register("seatNumber")}
 								className="form-control w-full"
@@ -152,11 +152,11 @@ const ModalAddTicket = ({ setShowModalAdd, showModalAdd, callBack }: IProps) => 
 				<div className="my-2">
 					<div className="flex items-center">
 						<span className="w-[140px] font-medium text-base">
-							Email:
+							Gía vé:
 						</span>
 						<div className="flex-1">
 							<input
-								placeholder="Nhập Email"
+								placeholder="Nhập giá vé"
 								type="text"
 								{...register("price")}
 								className="form-control w-full"
