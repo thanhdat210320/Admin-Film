@@ -17,7 +17,7 @@ const schema = yup.object().shape({
 	duration: yup.number().typeError("Trường này bắt buộc nhập số").required("Trường này bắt buộc nhập"),
 	director: yup.string().required("Vui lòng nhập startDate"),
 	cinemaId: yup.string().required("Vui lòng nhập cateId"),
-	genre: yup.number().typeError("Trường này bắt buộc nhập số"),
+	genre: yup.string().typeError("Trường này bắt buộc nhập chữ"),
 	trailer: yup.string().required("Vui lòng nhập transport")
 })
 
